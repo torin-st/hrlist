@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<faces-config version="2.2"
+              xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+    
+    <application>
+        <resource-bundle>
+            <base-name>
+                com.slyadz.hrlist.client.web.message.message
+            </base-name>
+            <var>bundle</var>
+        </resource-bundle>
+        <locale-config>
+            <default-locale>ru</default-locale>
+            <supported-locale>en</supported-locale>            
+        </locale-config>
+    </application>
+    
+    
+    <navigation-rule>
+        <navigation-case>
+            <from-outcome>departmentCreated</from-outcome>
+            <to-view-id>/index</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>departmentDeleted</from-outcome>
+            <to-view-id>/index</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>departmentError</from-outcome>
+            <to-view-id>/error</to-view-id>
+            <redirect />
+        </navigation-case>        
+        <navigation-case>
+            <from-outcome>departmentUpdated</from-outcome>
+            <to-view-id>/index</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>departmentPrepared</from-outcome>
+            <to-view-id>/new</to-view-id>
+            <redirect />
+        </navigation-case>        
+    </navigation-rule>
+</faces-config>

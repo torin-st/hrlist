@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />  
+        <h:outputStylesheet library="css" name="stylesheet.css"/>
+        <ui:insert name="htmlHead"><title>Template's title</title></ui:insert>
+    </h:head>
+    <h:body>
+        <h:form>
+            <f:event listener="#{localeBean.componentInit}" type="preRenderView" />
+            <h:outputText value="#{bundle.TemplateLanguage}" />&nbsp;
+            <h:selectOneMenu value="#{localeBean.localeCode}" onchange="submit()" valueChangeListener="#{localeBean.countryLocaleCodeChanged}">
+                <f:selectItems value="#{localeBean.countriesInMap}" />
+            </h:selectOneMenu><br />
+            <h:outputText id="userName" value="#{bundle.TemplateUser} #{authBean.userName}" />&nbsp;<h:commandLink id="logout" action="#{authBean.userLogout()}" rendered="#{authBean.userName != '-'}" value="#{bundle.TemplateLogout}" /><br />
+        </h:form>        
+        <ui:insert name="htmlBody"><h1>Template's body</h1></ui:insert>
+    </h:body>
+</html>
+
