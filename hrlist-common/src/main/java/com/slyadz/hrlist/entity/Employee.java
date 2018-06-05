@@ -37,13 +37,16 @@ public class Employee implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date birthday;
     private Float salary;
-//    @ManyToOne
-//    @JoinColumn(name = "DEPARTMENT_ID")
-//    private Department department;
 
     public Employee() {
     }
-    
+
+    public Employee(String name, Date birthday, Float salary) {
+        this.name = name;
+        this.birthday = birthday;
+        this.salary = salary;
+    }
+
     public String getName() {
         return name;
     }
@@ -68,14 +71,6 @@ public class Employee implements Serializable {
         this.salary = salary;
     }
 
-//    public Department getDepartment() {
-//        return department;
-//    }
-//
-//    public void setDepartment(Department department) {
-//        this.department = department;
-//    }
-
     public Long getId() {
         return id;
     }
@@ -88,25 +83,41 @@ public class Employee implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
+        hash += (name != null ? name.hashCode() : 0);
+        hash += (birthday != null ? birthday.hashCode() : 0);
+        hash += (salary != null ? salary.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Employee)) {
-            return false;
-        }
-        Employee other = (Employee) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
 
-    @Override
-    public String toString() {
-        return "com.slyadz.hrlist.entity.Employee[ id=" + id + " ]";
+        boolean result = true;
+
+        if (!(object instanceof Employee)) {
+            result = false;
+        }
+
+        Employee other = (Employee) object;
+        if (result && !this.id.equals(other.id)) {
+            result = false;
+        }
+        if (result && !this.name.equals(other.name)) {
+            result = false;
+        }
+        if (result && !this.birthday.equals(other.birthday)) {
+            result = false;
+        }
+        if (result && !this.salary.equals(other.salary)) {
+            result = false;
+        }
+        return result;
     }
     
+    @Override
+    public String toString() {
+        return "com.slyadz.hrlist.entity.Employee[id=" + id + ", name=" + name
+                + ", birtday=" + birthday + ", salary=" + salary + "]";
+    }
+
 }

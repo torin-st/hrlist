@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.slyadz.hrlist.service.ejb;
+package com.slyadz.hrlist.service.rs;
 
 import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Department_;
@@ -40,13 +40,13 @@ import javax.ws.rs.core.Response;
  */
 @Stateless
 @Path("departments")
-public class DepartmentService implements Serializable {
+public class DepartmentRS implements Serializable {
 
     private EntityManagerFactory emf;
     private EntityManager em;
     private EntityTransaction et;
 
-    public DepartmentService() {
+    public DepartmentRS() {
         emf = Persistence.createEntityManagerFactory("hrlist");
         em = emf.createEntityManager();
         et = em.getTransaction();

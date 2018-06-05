@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="htmlHead">
+        <title>#{bundle.EmployeeIndexTitle}</title>
+    </ui:define>
+
+
+    <ui:define name="htmlBody">
+        <h1>#{bundle.EmployeeIndexHeader}</h1>
+        <h:form id="form">
+            <h:dataTable var="employee"
+                         summary="#{bundle.EmployeeIndexTableHeader}"
+                         value="#{employeeBean.getAllEmployees()}"
+                         rules="all"
+                         cellpadding="5">
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="№" />
+                    </f:facet>
+                    <h:outputText value="#{employee.id}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{bundle.EmployeeIndexColumnNameHeader}" />
+                    </f:facet>
+                    <h:outputText value="#{employee.name}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
+                    </f:facet>
+                    <h:outputText value="#{employee.birthday}">
+                       <!--<f:converter converterId="birthday"/>                        -->
+                    </h:outputText>
+                </h:column>                
+                <!-- Operations -->
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{bundle.EmployeeIndexColumnOperationHeader}" />
+                    </f:facet>
+                    <h:commandButton value="#{bundle.EmployeeIndexButtonDelete}" action="#{employeeBean.deleteEmployee}" />&nbsp;
+                    <!--
+                    <h:commandButton value="#{bundle.EmployeeIndexButtonEdit}" action="edit.xhtml?faces-redirect=true">
+                        <f:setPropertyActionListener target="#{departmentBean.department}"
+                                                     value="#{department}" />
+                    </h:commandButton>
+                    -->
+                </h:column>
+                <f:facet name="footer">
+                    <h:panelGroup style="display: block; text-align: right">
+                        <h:commandButton value="#{bundle.EmployeeIndexButtonNew}" action="#{employeeBean.prepareEmployee}" />
+                    </h:panelGroup>
+                </f:facet>
+            </h:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

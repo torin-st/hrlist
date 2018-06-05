@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://ws.service.hrlist.slyadz.com/" xmlns:tns="http://ws.service.hrlist.slyadz.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="createEmployee" type="tns:createEmployee"/>
+
+  <xs:element name="createEmployeeResponse" type="tns:createEmployeeResponse"/>
+
+  <xs:element name="deleteEmployee" type="tns:deleteEmployee"/>
+
+  <xs:element name="deleteEmployeeResponse" type="tns:deleteEmployeeResponse"/>
+
+  <xs:element name="employee" type="tns:employee"/>
+
+  <xs:element name="getAllEmployees" type="tns:getAllEmployees"/>
+
+  <xs:element name="getAllEmployeesResponse" type="tns:getAllEmployeesResponse"/>
+
+  <xs:element name="test" type="tns:test"/>
+
+  <xs:element name="testResponse" type="tns:testResponse"/>
+
+  <xs:complexType name="test">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="testResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deleteEmployee">
+    <xs:sequence>
+      <xs:element name="employeeId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deleteEmployeeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAllEmployees">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAllEmployeesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:employee" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="employee">
+    <xs:sequence>
+      <xs:element name="birthday" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="id" type="xs:long" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="salary" type="xs:float" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createEmployee">
+    <xs:sequence>
+      <xs:element ref="tns:employee" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createEmployeeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

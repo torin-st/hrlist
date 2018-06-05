@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.slyadz.hrlist.service.ejb;
+package com.slyadz.hrlist.service.rs;
 
 import com.slyadz.hrlist.entity.Department;
-import com.slyadz.hrlist.entity.Department_;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +14,6 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,12 +23,12 @@ import static org.junit.Assert.*;
  *
  * @A.G. Slyadz
  */
-public class DepartmentServiceEmbeddedTestIT {
+public class DepartmentRSEmbeddedTestIT {
 
     private static EJBContainer ejbContainer;
     private static Context ctx;
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("hrlistIT");
-    private static DepartmentService departmentService;
+    private static DepartmentRS departmentRS;
 
     @BeforeClass
     public static void setUpClass() throws NamingException {
@@ -41,8 +36,8 @@ public class DepartmentServiceEmbeddedTestIT {
         properties.put(EJBContainer.MODULES, new File[]{new File("target/classes"), new File("target/test-classes")});
         ejbContainer = EJBContainer.createEJBContainer(properties);
         ctx = ejbContainer.getContext();
-        departmentService = (DepartmentService) ctx.lookup("java:global/classes/DepartmentService");
-        departmentService.setEntityManagerFactory(emf);
+        departmentRS = (DepartmentRS) ctx.lookup("java:global/classes/DepartmentRS");
+        departmentRS.setEntityManagerFactory(emf);
     }
 
     @AfterClass
@@ -65,12 +60,12 @@ public class DepartmentServiceEmbeddedTestIT {
     @Test
     public void getDepartmentById() {
         Department testDepartment1 = new Department("junitTestName1");
-        departmentService.createDepartment(testDepartment1);
+        departmentRS.createDepartment(testDepartment1);
         Department testDepartment2 = new Department("junitTestName2");
-        departmentService.createDepartment(testDepartment2);
+        departmentRS.createDepartment(testDepartment2);
 
-        assertEquals(testDepartment1, departmentService.getDepartmentById(testDepartment1.getId()));
-        assertNotEquals(testDepartment2, departmentService.getDepartmentById(testDepartment1.getId()));
+        assertEquals(testDepartment1, departmentRS.getDepartmentById(testDepartment1.getId()));
+        assertNotEquals(testDepartment2, departmentRS.getDepartmentById(testDepartment1.getId()));
     }
 
     /**
@@ -80,12 +75,12 @@ public class DepartmentServiceEmbeddedTestIT {
      */
     @Test
     public void getAllDepartments() {
-        int startDerartmentsCount = departmentService.getAllDepartments().size();
+        int startDerartmentsCount = departmentRS.getAllDepartments().size();
         Department testDepartment3 = new Department("junitTestName3");
-        departmentService.createDepartment(testDepartment3);
+        departmentRS.createDepartment(testDepartment3);
         Department testDepartment4 = new Department("junitTestName4");
-        departmentService.createDepartment(testDepartment4);
-        int endDepartmentsCount = departmentService.getAllDepartments().size();
+        departmentRS.createDepartment(testDepartment4);
+        int endDepartmentsCount = departmentRS.getAllDepartments().size();
 
         assertEquals(startDerartmentsCount + 2, endDepartmentsCount);
     }
@@ -97,11 +92,11 @@ public class DepartmentServiceEmbeddedTestIT {
     @Test
     public void createDepartment() {
         Department testDepartment5 = new Department("junitTestName5");
-        departmentService.createDepartment(testDepartment5);
+        departmentRS.createDepartment(testDepartment5);
 
         System.out.println(testDepartment5);
-        System.out.println(departmentService.getDepartmentById(testDepartment5.getId()));
+        System.out.println(departmentRS.getDepartmentById(testDepartment5.getId()));
 
-        assertEquals(testDepartment5, departmentService.getDepartmentById(testDepartment5.getId()));
+        assertEquals(testDepartment5, departmentRS.getDepartmentById(testDepartment5.getId()));
     }
 }

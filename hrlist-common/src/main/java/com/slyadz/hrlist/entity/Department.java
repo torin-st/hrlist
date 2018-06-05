@@ -11,11 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -32,24 +32,25 @@ public class Department implements Serializable {
     @Size(max = 30)
     @NotNull
     private String name;
-//    @OneToMany(mappedBy = "department")
-//    private List<Employee> employees;
-//
-//    public List<Employee> getEmployees() {
-//        return employees;
-//    }
-//
-//    public void setEmployees(List<Employee> employees) {
-//        this.employees = employees;
-//    }
-    
+    @OneToMany
+    @JoinColumn(name = "DEPARTMENT_FK")
+    private List<Employee> employees;
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
+
     public Department() {
     }
 
-    public Department(String name){
+    public Department(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -84,19 +85,18 @@ public class Department implements Serializable {
         }
 
         Department other = (Department) object;
-        if (!this.id.equals(other.id)) {
+        if (result && !this.id.equals(other.id)) {
             result = false;
         }
-        if (!this.name.equals(other.name)) {
+        if (result && !this.name.equals(other.name)) {
             result = false;
         }
-
         return result;
     }
 
     @Override
     public String toString() {
-        return "com.slyadz.hrlist.service.entity.department[id=" + id + ", name=" + name + "]";
+        return "com.slyadz.hrlist.entity.Department[id=" + id + ", name=" + name + "]";
     }
 
 }

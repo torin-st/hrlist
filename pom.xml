@@ -12,8 +12,8 @@
     </properties>
     
   <modules>
-    <module>hrlist-client</module>
-    <module>hrlist-service</module>
     <module>hrlist-common</module>
+    <module>hrlist-service</module>    
+    <module>hrlist-client</module>
   </modules>
 </project>

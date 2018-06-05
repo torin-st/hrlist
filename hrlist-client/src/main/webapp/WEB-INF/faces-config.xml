@@ -16,8 +16,7 @@
             <supported-locale>en</supported-locale>            
         </locale-config>
     </application>
-    
-    
+        
     <navigation-rule>
         <navigation-case>
             <from-outcome>departmentCreated</from-outcome>
@@ -41,6 +40,20 @@
         <navigation-case>
             <from-outcome>departmentPrepared</from-outcome>
             <to-view-id>/new</to-view-id>
+            <redirect />
+        </navigation-case>        
+        <navigation-case>
+            <from-outcome>employeeDeleted</from-outcome>
+            <to-view-id>/employees/index</to-view-id>
+        </navigation-case>        
+        <navigation-case>
+            <from-outcome>employeePrepared</from-outcome>
+            <to-view-id>/employees/new</to-view-id>
+            <redirect />
+        </navigation-case>                
+        <navigation-case>
+            <from-outcome>employeeCreated</from-outcome>
+            <to-view-id>/employees/index</to-view-id>
             <redirect />
         </navigation-case>        
     </navigation-rule>
