@@ -33,24 +33,29 @@
                 </h:column>
                 <h:column>
                     <f:facet name="header">
+                        <h:outputText value="#{bundle.EmployeeIndexColumnSalaryHeader}" />
+                    </f:facet>
+                    <h:outputText value="#{employee.salary}" />
+                </h:column>                
+                <!--
+                <h:column>
+                    <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.birthday}">
-                       <!--<f:converter converterId="birthday"/>                        -->
+                       <f:converter converterId="birthday"/>
                     </h:outputText>
-                </h:column>                
+                </h:column>-->
                 <!-- Operations -->
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnOperationHeader}" />
                     </f:facet>
                     <h:commandButton value="#{bundle.EmployeeIndexButtonDelete}" action="#{employeeBean.deleteEmployee}" />&nbsp;
-                    <!--
-                    <h:commandButton value="#{bundle.EmployeeIndexButtonEdit}" action="edit.xhtml?faces-redirect=true">
-                        <f:setPropertyActionListener target="#{departmentBean.department}"
-                                                     value="#{department}" />
+                    <h:commandButton value="#{bundle.EmployeeIndexButtonEdit}" action="/employees/edit.xhtml?faces-redirect=true">
+                        <f:setPropertyActionListener target="#{employeeBean.employee}"
+                                                     value="#{employee}" />
                     </h:commandButton>
-                    -->
                 </h:column>
                 <f:facet name="footer">
                     <h:panelGroup style="display: block; text-align: right">

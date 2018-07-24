@@ -5,7 +5,7 @@
  */
 package com.slyadz.hrlist.service.persistence;
 
-import com.slyadz.hrlist.entity.Employee;
+import com.slyadz.hrlist.service.ws.Employee;
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
@@ -84,7 +84,13 @@ public class EmployeeDAO {//extends AbstractFacade<Employee> {
         getEt().commit();
         return employee.getId();
     }
-
+    
+    public void update(Employee entity) {
+        getEt().begin();
+        getEm().merge(entity);
+        getEt().commit();
+    }    
+    
     @PreDestroy
     private void clean() {
         if (em != null) {

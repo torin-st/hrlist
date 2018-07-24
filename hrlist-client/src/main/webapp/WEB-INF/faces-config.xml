@@ -56,5 +56,10 @@
             <to-view-id>/employees/index</to-view-id>
             <redirect />
         </navigation-case>        
+        <navigation-case>
+            <from-outcome>employeeUpdated</from-outcome>
+            <to-view-id>/employees/index</to-view-id>
+            <redirect />
+        </navigation-case>        
     </navigation-rule>
 </faces-config>

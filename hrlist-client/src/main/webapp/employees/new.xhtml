@@ -19,13 +19,6 @@
                 <h:outputLabel for="employeeNameInput" value="#{bundle.EmployeeNewName}" />
                 <h:inputText id="employeeNameInput" value="#{employeeBean.employee.name}" />
                 <h:message for="employeeNameInput"/>
-                <!-- birthday -->
-                <h:outputLabel for="employeeBirthdayInput" value="#{bundle.EmployeeNewBirthday}" />
-                <h:inputText id="employeeBirthdayInput" value="#{employeeBean.employee.birthday}">
-                   <!-- <f:converter converterId="birthday"/>-->
-                   <f:convertDateTime type="date"/> 
-                </h:inputText>
-                <h:message for="employeeBirthdayInput"/>                
                 <!-- salary -->
                 <h:outputLabel for="employeeSalaryInput" value="#{bundle.EmployeeNewSalary}" />
                 <h:inputText id="employeeSalaryInput" value="#{employeeBean.employee.salary}" />

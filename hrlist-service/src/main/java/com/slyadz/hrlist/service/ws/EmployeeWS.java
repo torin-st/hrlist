@@ -7,31 +7,27 @@ package com.slyadz.hrlist.service.ws;
 
 import javax.jws.WebService;
 import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.service.persistence.EmployeeDAO;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import javax.ejb.EJB;
+import javax.jws.WebParam;
 
 /**
  *
- * @author A.G. Slyadz
+ * @author A. Slyadz
  */
 @WebService
 public class EmployeeWS {
 
     @EJB
     private EmployeeDAO employeeDAO;
-
     /**
      * Delete employee from db
      *
      * @param id - employee's id
      * @return boolean true or false
      */
-    @WebMethod
+    @WebMethod    
     public boolean deleteEmployee(@WebParam(name = "employeeId") long id) {
         boolean result = false;
 
@@ -44,8 +40,8 @@ public class EmployeeWS {
         }
         return result;
     }
-    
-     /**
+
+    /**
      * Create employee in db
      *
      * @param employee - Employee instance
@@ -53,15 +49,43 @@ public class EmployeeWS {
      */
     @WebMethod
     public boolean createEmployee(@WebParam(name = "employee") Employee employee) {
+
+        if (employee == null) {
+            System.out.println("employee is null!");
+            return false;
+        }
+
         boolean result = false;
 
-        System.out.println(employee);
         if (employeeDAO.create(employee) == 0) {
             System.out.println("Can't create Employee: " + employee);
         } else {
             result = true;
         }
         return result;
+    }
+    
+     /**
+     * Update employee in db
+     *
+     * @param employee - Employee instance
+     * @return boolean true or false
+     */
+    @WebMethod
+    public boolean updateEmployee(@WebParam(name = "employee") Employee employee) {
+
+        boolean result = false;
+                
+        if (employee == null) {
+            System.out.println("Can't update employee - it's null");
+        } else
+        {
+            employeeDAO.update(employee);
+            result = true;            
+        }
+
+        return result;
+        
     }
 
     /**
@@ -72,27 +96,7 @@ public class EmployeeWS {
     @WebMethod
     public List<Employee> getAllEmployees() {
         List<Employee> result = (List<Employee>) employeeDAO.findAll();
-        System.out.println(result);
         return result;
     }
-    
-    /**
-     * Create another Employee
-     *
-     * @return List<Employee>
-     */
-    @WebMethod
-    public boolean test() {
-        Employee employee = new Employee("Andrey" + (int)(Math.random() * 10) , new Date(System.currentTimeMillis()), 10000.0f);
-        
-        boolean result = false;
 
-        if (employeeDAO.create(employee) == 0) {
-            System.out.println("Can't create Employee: " + employee);
-        } else {
-            result = true;
-        }
-        
-        return result;
-    }    
 }

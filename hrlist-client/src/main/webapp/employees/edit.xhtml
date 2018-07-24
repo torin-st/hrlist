@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="htmlHead">
+        <title>#{bundle.EmployeeEditTitle}</title>
+    </ui:define>
+
+    <ui:define name="htmlBody">
+        <h1>#{bundle.EmployeeEditHeader}</h1>
+        <h:body>
+            <h:form id="employeeGrid">
+                <h:panelGrid id="employeeGrid" columns="2">
+                    <!-- Name -->
+                    <h:outputLabel for="employeeNameInput" value="#{bundle.EmployeeEditName}" />
+                    <h:inputText id="employeeNameInput" value="#{employeeBean.employee.name}" />
+                    <h:message for="employeeNameInput" />
+                    <!-- Salary -->
+                    <h:outputLabel for="employeeSalaryInput" value="#{bundle.EmployeeEditSalary}" />
+                    <h:inputText id="employeeSalaryInput" value="#{employeeBean.employee.salary}" />
+                    <h:message for="employeeSalaryInput" />                    
+                    <f:facet name="footer">
+                        <h:panelGroup style="display: block; text-align: right">
+                            <h:commandButton id="updateEmployeeButton"
+                                             action="#{employeeBean.updateEmployee(employeeBean.employee)}"
+                                             value="#{bundle.EmployeeEditButtonUpdate}" />&nbsp;
+                            <h:commandButton id="cancelButton"
+                                             immediate="true"
+                                             action="/employees/index.xhtml?faces-redirect=true"
+                                             value="#{bundle.EmployeeEditButtonCancel}" />
+                        </h:panelGroup>
+                    </f:facet>                
+                </h:panelGrid>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>

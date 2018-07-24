@@ -5,6 +5,7 @@
  */
 package com.slyadz.hrlist.entity;
 
+import com.slyadz.hrlist.service.ws.Employee;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;

@@ -67,11 +67,6 @@ public class EmployeeBean implements Serializable {
 
     public String createEmployee(Employee employee) {
         
-        employee = new Employee();
-        employee.setName("Andrey" + (int)(Math.random() * 10));
-        employee.setBirthday(new Date(System.currentTimeMillis()));
-        employee.setSalary(10000.0f);
-        
         String navigation = "employeeError";
 
         if (employee == null) {
@@ -80,6 +75,7 @@ public class EmployeeBean implements Serializable {
         
         EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
         boolean result = false;
+        
         result = employeeWS.createEmployee(employee);
         
         if (result) {
@@ -117,25 +113,27 @@ public class EmployeeBean implements Serializable {
         return navigation;
     }
 
-//    public String updateDepartment(Department department) {
-//        String navigation = "departmentError";
-//        if (department == null) {
-//            return navigation;
-//        }
-//
-//        Response response
-//                = client.target(serviceURL)
-//                        .path("/")
-//                        .request()
-//                        .put(Entity.entity(department, MediaType.APPLICATION_XML), Response.class);
-//        if (Response.Status.SEE_OTHER.getStatusCode() == response.getStatus()) {
-//            navigation = "departmentUpdated";
-//        } else {
-//            System.out.println("==" + response.getStatus());
-//            FacesContext context = FacesContext.getCurrentInstance();
-//            context.addMessage(null,
-//                    new FacesMessage("Couldn't update department."));
-//        }
-//        return navigation;
-//    }
+    public String updateEmployee(Employee employee) {
+        
+        String navigation = "employeeError";
+        if (employee == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage("Couldn't update employee, employee == null."));                        
+            return navigation;
+        }
+
+        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+        boolean result = false;
+        result = employeeWS.updateEmployee(employee);
+
+        if (result) {
+            navigation = "employeeUpdated";
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage("Server could't update employee."));
+            navigation = "employeeError";            
+        }
+        
+        return navigation;
+    }
 }

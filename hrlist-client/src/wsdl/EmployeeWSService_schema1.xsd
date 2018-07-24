@@ -15,15 +15,25 @@
 
   <xs:element name="getAllEmployeesResponse" type="tns:getAllEmployeesResponse"/>
 
-  <xs:element name="test" type="tns:test"/>
+  <xs:element name="updateEmployee" type="tns:updateEmployee"/>
 
-  <xs:element name="testResponse" type="tns:testResponse"/>
+  <xs:element name="updateEmployeeResponse" type="tns:updateEmployeeResponse"/>
 
-  <xs:complexType name="test">
-    <xs:sequence/>
+  <xs:complexType name="updateEmployee">
+    <xs:sequence>
+      <xs:element name="employee" type="tns:employee" minOccurs="0"/>
+    </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="testResponse">
+  <xs:complexType name="employee">
+    <xs:sequence>
+      <xs:element name="id" type="xs:long" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="salary" type="xs:float" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateEmployeeResponse">
     <xs:sequence>
       <xs:element name="return" type="xs:boolean"/>
     </xs:sequence>
@@ -51,18 +61,9 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="employee">
-    <xs:sequence>
-      <xs:element name="birthday" type="xs:dateTime" minOccurs="0"/>
-      <xs:element name="id" type="xs:long" minOccurs="0"/>
-      <xs:element name="name" type="xs:string" minOccurs="0"/>
-      <xs:element name="salary" type="xs:float" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-
   <xs:complexType name="createEmployee">
     <xs:sequence>
-      <xs:element ref="tns:employee" minOccurs="0"/>
+      <xs:element name="employee" type="tns:employee" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 

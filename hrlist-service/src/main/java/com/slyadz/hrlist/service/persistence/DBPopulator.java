@@ -5,11 +5,7 @@
  */
 package com.slyadz.hrlist.service.persistence;
 
-import com.slyadz.hrlist.service.persistence.EmployeeDAO;
-import com.slyadz.hrlist.entity.Department;
-import com.slyadz.hrlist.entity.Employee;
 import java.io.Serializable;
-import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
