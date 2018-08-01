@@ -16,7 +16,7 @@
         <h:form id="form">
             <h:dataTable var="employee"
                          summary="#{bundle.EmployeeIndexTableHeader}"
-                         value="#{employeeBean.getAllEmployees()}"
+                         value="#{employeeBean.getEmployeesByDepartment(departmentBean.department)}"
                          rules="all"
                          cellpadding="5">
                 <h:column>

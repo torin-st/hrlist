@@ -9,11 +9,17 @@
 
   <xs:element name="deleteEmployeeResponse" type="tns:deleteEmployeeResponse"/>
 
+  <xs:element name="department" type="tns:department"/>
+
   <xs:element name="employee" type="tns:employee"/>
 
   <xs:element name="getAllEmployees" type="tns:getAllEmployees"/>
 
   <xs:element name="getAllEmployeesResponse" type="tns:getAllEmployeesResponse"/>
+
+  <xs:element name="getEmployeesByDepartment" type="tns:getEmployeesByDepartment"/>
+
+  <xs:element name="getEmployeesByDepartmentResponse" type="tns:getEmployeesByDepartmentResponse"/>
 
   <xs:element name="updateEmployee" type="tns:updateEmployee"/>
 
@@ -27,15 +33,36 @@
 
   <xs:complexType name="employee">
     <xs:sequence>
+      <xs:element name="birthday" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="department" type="tns:department" minOccurs="0"/>
       <xs:element name="id" type="xs:long" minOccurs="0"/>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="salary" type="xs:float" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="department">
+    <xs:sequence>
+      <xs:element name="id" type="xs:long" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="updateEmployeeResponse">
     <xs:sequence>
       <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEmployeesByDepartment">
+    <xs:sequence>
+      <xs:element name="departmentId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEmployeesByDepartmentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:employee" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 

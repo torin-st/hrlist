@@ -30,6 +30,12 @@
   <message name="getAllEmployeesResponse">
     <part name="parameters" element="tns:getAllEmployeesResponse"/>
   </message>
+  <message name="getEmployeesByDepartment">
+    <part name="parameters" element="tns:getEmployeesByDepartment"/>
+  </message>
+  <message name="getEmployeesByDepartmentResponse">
+    <part name="parameters" element="tns:getEmployeesByDepartmentResponse"/>
+  </message>
   <portType name="EmployeeWS">
     <operation name="deleteEmployee">
       <input wsam:Action="http://ws.service.hrlist.slyadz.com/EmployeeWS/deleteEmployeeRequest" message="tns:deleteEmployee"/>
@@ -46,6 +52,10 @@
     <operation name="getAllEmployees">
       <input wsam:Action="http://ws.service.hrlist.slyadz.com/EmployeeWS/getAllEmployeesRequest" message="tns:getAllEmployees"/>
       <output wsam:Action="http://ws.service.hrlist.slyadz.com/EmployeeWS/getAllEmployeesResponse" message="tns:getAllEmployeesResponse"/>
+    </operation>
+    <operation name="getEmployeesByDepartment">
+      <input wsam:Action="http://ws.service.hrlist.slyadz.com/EmployeeWS/getEmployeesByDepartmentRequest" message="tns:getEmployeesByDepartment"/>
+      <output wsam:Action="http://ws.service.hrlist.slyadz.com/EmployeeWS/getEmployeesByDepartmentResponse" message="tns:getEmployeesByDepartmentResponse"/>
     </operation>
   </portType>
   <binding name="EmployeeWSPortBinding" type="tns:EmployeeWS">
@@ -78,6 +88,15 @@
       </output>
     </operation>
     <operation name="getAllEmployees">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getEmployeesByDepartment">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>

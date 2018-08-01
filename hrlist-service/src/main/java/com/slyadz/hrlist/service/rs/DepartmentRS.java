@@ -122,6 +122,32 @@ public class DepartmentRS implements Serializable {
         return result;
     }
     /**
+     * Get department by name
+     *
+     * @param departmentName - the name of the department
+     *
+     * @throws WebApplicationException(Response.Status.NOT_FOUND) if result is
+     * null
+     *
+     * @return Department
+     */
+    @GET
+    @Path("/getbyname/{departmentName}")
+    @Produces({MediaType.APPLICATION_XML})
+    public Department getDepartmentByName(@PathParam("departmentName") String departmentName) {
+        Department result = null;
+        try {
+            result = findDepartmentByName(departmentName);
+            if (result == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            System.out.println("Error while calling findDepartmentByName(): " + e.getMessage());
+        }
+        return result;
+    }
+    
+    /**
      * Create a Department
      *
      * @param department
@@ -214,6 +240,19 @@ public class DepartmentRS implements Serializable {
         return q.getSingleResult();
     }
 
+    //Criteria query with a dynamic metamodel
+    //
+    private Department findDepartmentByName(String departmentName) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        Metamodel m = em.getMetamodel();
+        EntityType<Department> Dep_ = m.entity(Department.class);
+        CriteriaQuery<Department> cq = cb.createQuery(Department.class);
+        Root<Department> department = cq.from(Department.class);
+        cq.select(department);
+        cq.where(cb.equal(department.get(Dep_.getSingularAttribute("name")), departmentName));
+        TypedQuery<Department> q = em.createQuery(cq);
+        return q.getSingleResult();
+    }
     //Persisting new object to DB
     //
     private Long persistDepartment(Department department) throws Exception {

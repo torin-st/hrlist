@@ -5,11 +5,11 @@
  */
 package com.slyadz.hrlist.client.web.managedbean;
 
+import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.service.ws.Employee;
 import com.slyadz.hrlist.service.ws.EmployeeWS;
 import com.slyadz.hrlist.service.ws.EmployeeWSService;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -62,6 +62,17 @@ public class EmployeeBean implements Serializable {
                 
         EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
         return employeeWS.getAllEmployees();
+
+    }
+    
+    public List<Employee> getEmployeesByDepartment(com.slyadz.hrlist.service.ws.Department department) {
+                
+        if (department == null){
+            throw new IllegalArgumentException("department is null!");
+        } 
+        
+        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+        return employeeWS.getEmployeesByDepartment(department.getId());
 
     }
 

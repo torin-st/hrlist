@@ -7,6 +7,7 @@ package com.slyadz.hrlist.client.web.managedbean;
 
 import com.slyadz.hrlist.entity.Department;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -31,42 +32,84 @@ public class DepartmentBean implements Serializable {
 
     private final String serviceURL = "http://localhost:8080/hrlist-service/api/departments";
     private Client client;
-    private Department department;
+    private com.slyadz.hrlist.service.ws.Department department;
+
+    public List<com.slyadz.hrlist.service.ws.Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<com.slyadz.hrlist.service.ws.Department> departments) {
+        this.departments = departments;
+    }
+    private List<com.slyadz.hrlist.service.ws.Department> departments;
 
     public DepartmentBean() {
     }
 
-    public Department getDepartment() {
+    public com.slyadz.hrlist.service.ws.Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(com.slyadz.hrlist.service.ws.Department department) {
         this.department = department;
     }
 
     @PostConstruct
     private void init() {
         client = ClientBuilder.newClient();
-        department = new Department();
+        department = new com.slyadz.hrlist.service.ws.Department();
+        departments = getAllDepartments();
+        System.out.println("DepartmentBean: postConstruct");
     }
 
     @PreDestroy
     private void clean() {
         client.close();
+        System.out.println("DepartmentBean: preDestroy");        
     }
     
     public String prepareDepartment(){
         String navigation = "departmentPrepared";
-        setDepartment(new Department());
+        setDepartment(new com.slyadz.hrlist.service.ws.Department());
         return navigation;
     }
 
-    public List<Department> getAllDepartments() {
+    public Department getDepartmentById(Long departmentId) {
         return client.target(serviceURL)
+                .path(departmentId.toString())
+                .request(MediaType.APPLICATION_XML)
+                .get(Department.class);
+    }    
+    
+    public Department getDepartmentByName(String departmentName) {
+        return client.target(serviceURL)
+                .path("/getbyname/" + departmentName)
+                .request(MediaType.APPLICATION_XML)
+                .get(Department.class);
+    }
+    
+//    public List<Department> getAllDepartments() {
+//        return client.target(serviceURL)
+//                .path("/")
+//                .request(MediaType.APPLICATION_XML)
+//                .get(new GenericType<List<Department>>() {
+//                });
+//    }
+    public List<com.slyadz.hrlist.service.ws.Department> getAllDepartments() {
+        ArrayList<com.slyadz.hrlist.entity.Department> mock = client.target(serviceURL)
                 .path("/")
                 .request(MediaType.APPLICATION_XML)
-                .get(new GenericType<List<Department>>() {
+                .get(new GenericType<ArrayList<com.slyadz.hrlist.entity.Department>>() {
                 });
+        List<com.slyadz.hrlist.service.ws.Department> result = new ArrayList<>();
+        for (int i = 0; i < mock.size(); i++) {
+            com.slyadz.hrlist.entity.Department get = mock.get(i);
+            com.slyadz.hrlist.service.ws.Department t = new com.slyadz.hrlist.service.ws.Department();
+            t.setId(get.getId());
+            t.setName(get.getName());
+            result.add(t);            
+        }
+        return result;
     }
 
     public String createDepartment(Department department) {

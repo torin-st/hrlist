@@ -20,11 +20,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * @author A. G. Slyadz
  */
 @FacesConverter("birthday")
-public class Test implements Converter {
+public class BirthdayConverter implements Converter {
 
     public static final String CONVERSION_ERROR_MESSAGE_ID = "ConversionError";
 
-    public Test() {
+    public BirthdayConverter() {
     }
 
     /**

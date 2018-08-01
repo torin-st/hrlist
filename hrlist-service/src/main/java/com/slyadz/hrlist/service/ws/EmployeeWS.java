@@ -99,4 +99,22 @@ public class EmployeeWS {
         return result;
     }
 
+     /**
+     * Select employees by department id
+     *
+     * @param departmentId - department id (long)
+     * @return List<Employee>
+     */
+    @WebMethod
+    public List<Employee> getEmployeesByDepartment(@WebParam(name = "departmentId") long departmentId) {
+
+        if (departmentId <= 0) {
+            throw new IllegalArgumentException("Department's id is below 0!");
+        } else
+        {
+            return employeeDAO.findByDepartment(departmentId);
+        }
+        
+    }
+    
 }

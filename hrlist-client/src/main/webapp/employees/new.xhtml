@@ -23,6 +23,12 @@
                 <h:outputLabel for="employeeSalaryInput" value="#{bundle.EmployeeNewSalary}" />
                 <h:inputText id="employeeSalaryInput" value="#{employeeBean.employee.salary}" />
                 <h:message for="employeeSalaryInput"/>                                
+                <!-- birthday -->
+                <h:outputLabel for="employeeBirthdayInput" value="#{bundle.EmployeeNewBirthday}" />
+                <h:inputText id="employeeBirthdayInput" value="#{employeeBean.employee.birthday}">
+                    <f:converter converterId="birthday"/>
+                </h:inputText>
+                <h:message for="employeeBirthdayInput"/>                                                
                 <f:facet name="footer">
                     <h:panelGroup style="display: block; text-align: right">
                         <h:commandButton id="createEmployeeButton"

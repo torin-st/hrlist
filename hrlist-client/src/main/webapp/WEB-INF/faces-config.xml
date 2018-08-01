@@ -58,7 +58,7 @@
         </navigation-case>        
         <navigation-case>
             <from-outcome>employeeUpdated</from-outcome>
-            <to-view-id>/employees/index</to-view-id>
+            <to-view-id>/employees/details</to-view-id>
             <redirect />
         </navigation-case>        
     </navigation-rule>
