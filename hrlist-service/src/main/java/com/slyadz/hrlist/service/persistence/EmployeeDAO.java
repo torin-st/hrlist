@@ -1,121 +1,103 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.service.persistence;
 
 import com.slyadz.hrlist.entity.Department_;
-import com.slyadz.hrlist.service.ws.Employee;
-import com.slyadz.hrlist.service.ws.Employee_;
+import com.slyadz.hrlist.entity.Department;
+import com.slyadz.hrlist.entity.Employee;
+import com.slyadz.hrlist.entity.Employee_;
+import java.io.IOException;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.inject.Inject;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 /**
+ * DAO class for Employee entity
  *
- * @author user
+ * @author A.G. Slyadz
  */
 @Stateless
-public class EmployeeDAO {//extends AbstractFacade<Employee> {
+public class EmployeeDAO extends CommonDAO<Employee> {
 
-    //@PersistenceContext(unitName = "hrlist")
-    private EntityManagerFactory emf;
-    private EntityManager em;
-    private EntityTransaction et;
+    @Inject
+    @PersistenceUnitName
+    private NameReturner nameReturner;
 
-    public EntityTransaction getEt() {
-        return et;
+    public NameReturner getNameReturner() {
+        return nameReturner;
     }
 
-    public void setEt(EntityTransaction et) {
-        this.et = et;
+    public void setNameReturner(NameReturner nameReturner) {
+        this.nameReturner = nameReturner;
     }
 
-    public EntityManagerFactory getEmf() {
-        return emf;
-    }
-
-    public void setEmf(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-
-    public EntityManager getEm() {
-        return em;
-    }
-
-    public void setEm(EntityManager em) {
-        this.em = em;
-    }
-
+    /**
+     * Constructor
+     */
     public EmployeeDAO() {
-        emf = Persistence.createEntityManagerFactory("hrlist");
-        em = emf.createEntityManager();
-        et = em.getTransaction();
     }
 
-    public List<Employee> findAll() {
-        javax.persistence.criteria.CriteriaQuery cq = getEm().getCriteriaBuilder().createQuery();
-        cq.select(cq.from(Employee.class));
-        getEt().begin();
-        List <Employee> result = getEm().createQuery(cq).getResultList();
-        getEt().commit();
-        return result;
-    }    
-        
-    public Employee findById(long id) {
-        getEt().begin();
-        Employee result = getEm().find(Employee.class, id);
-        getEt().commit();
-        return result;
-    }    
-    
-    public List<Employee> findByDepartment(long departmentId) {
-        CriteriaBuilder cb = getEm().getCriteriaBuilder();
-        CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
-        Root<Employee> e = cq.from(Employee.class);        
-        cq.select(e);
-        cq.where(cb.equal(e.get(Employee_.department).get(Department_.id), departmentId));
-        getEt().begin();
-        List <Employee> result = getEm().createQuery(cq).getResultList();
-        getEt().commit();
-        return result;
-    }    
-
-    public void delete(Employee entity) {
-        getEt().begin();
-        getEm().remove(getEm().merge(entity));
-        getEt().commit();
+    @PostConstruct
+    private void init() {
+        super.init(Employee.class, getNameReturner().getPersistenceUnitName());
     }
-    
-    public long create(Employee employee) {
-        getEt().begin();
-        getEm().persist(employee);
-        getEt().commit();
+
+    /**
+     * Persist the department to db
+     *
+     * @param employee
+     * @return department's Id
+     * @throws java.io.IOException
+     */
+    @Override
+    public Long create(Employee employee) throws IOException {
+        try {
+            getEt().begin();
+            employee.setDepartment(getEm().find(Department.class, employee.getDepartment().getId()));
+            getEm().persist(employee);
+            getEt().commit();
+        } catch (Exception e) {
+            getEt().rollback();
+            throw new IOException(e.getMessage());
+        }
         return employee.getId();
     }
-    
-    public void update(Employee entity) {
-        getEt().begin();
-        getEm().merge(entity);
-        getEt().commit();
-    }    
-    
+
+     /**
+     * Persist the department to db
+     *
+     * @param departmentId
+     * @return list of employees by id
+     * @throws java.io.IOException
+     */    
+    public List<Employee> findByDepartmentId(Long departmentId) throws IOException {
+        List <Employee> result = null;
+        try {
+            CriteriaBuilder cb = getEm().getCriteriaBuilder();
+            CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+            Root<Employee> e = cq.from(Employee.class);
+            cq.select(e);
+            cq.where(cb.equal(e.get(Employee_.department).get(Department_.id), departmentId));
+            getEt().begin();
+            result = getEm().createQuery(cq).getResultList();
+            getEt().commit();
+        } catch (Exception e) {
+            getEt().rollback();
+            throw new IOException(e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Closes EntityManager and EntityMangerFactory if they are not null.
+     */
     @PreDestroy
-    private void clean() {
-        if (em != null) {
-            em.close();
-        }
-        if (emf != null) {
-            emf.close();
-        }
+    @Override
+    protected void clean() {
+        super.clean();
     }
 
 }

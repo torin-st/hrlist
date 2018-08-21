@@ -1,102 +1,83 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.client.web.converter;
 
+import com.slyadz.hrlist.client.web.managedbean.DepartmentBean;
 import com.slyadz.hrlist.entity.Department;
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * Converter class for a Department type.
+ * 
  * @author A. G. Slyadz
  */
-@FacesConverter(forClass = com.slyadz.hrlist.service.ws.Department.class)//"departmentCV")
+@FacesConverter(forClass = Department.class)
 public class DepartmentConverter implements Converter {
 
     public static final String CONVERSION_ERROR_MESSAGE_ID = "ConversionError";
 
-    
     public DepartmentConverter() {
     }
 
     /**
      * Converts into Department instance from id.
-     * @param context
-     * @param component
-     * @param newValue
+     *
+     * @param context Faces context
+     * @param component UI component
+     * @param newValue new value
      * @return 
      */
     @Override
     public Object getAsObject(FacesContext context,
             UIComponent component, String newValue)
             throws ConverterException {
-
-        System.out.println("getAsObject:");
-        
         if (newValue.isEmpty()) {
-            System.out.println("getAsObject: newValue.isEmpty");
-            return null;
+            throw new IllegalArgumentException("New value is empty!");
+
         }
-       
-        com.slyadz.hrlist.service.ws.Department convertedValue = new com.slyadz.hrlist.service.ws.Department();
-        com.slyadz.hrlist.entity.Department mock = null;
+        //Workaround to "inject" DepartmentBean instance 
+        DepartmentBean departmentBean = context.getApplication().evaluateExpressionGet(context, "#{departmentBean}", DepartmentBean.class);
+        Department convertedValue = null;
         
-        try {
-           //
-           Client client = ClientBuilder.newClient();
-           mock = client.target("http://localhost:8080/hrlist-service/api/departments")
-                .path(newValue)
-                .request(MediaType.APPLICATION_XML)
-                .get(com.slyadz.hrlist.entity.Department.class);
-           client.close();
-           convertedValue.setId(mock.getId());
-           convertedValue.setName(mock.getName());
-           System.out.print("convertedValue = " + convertedValue);
-           if (convertedValue == null){
-            throw new NullPointerException("convertedValue is null after request!");
-           }
-           
-        } catch (Exception e) {
-            throw new ConverterException("Error while converting: " + e.getMessage());
+        if (departmentBean == null) {
+            throw new NullPointerException("departmentBean is null!");
+        } else
+        {
+            convertedValue = departmentBean.getDepartments().stream()
+                    .filter(x -> newValue.equals(x.getId().toString()))
+                    .findAny()
+                    .orElse(null);
+        }
+
+        if (convertedValue == null) {
+                throw new NullPointerException("Converted value is null after request!");
         }
 
         return convertedValue;
     }
 
     /**
-     * Formats the value by inserting space after every four characters for
-     * better readability if they don't already exist. In the process converts
-     * any <code>"-"</code> characters into blanks for consistency.
-     * @param context
-     * @param component
-     * @param value
-     * @return 
+     * Converts into String from a Department instance (uses it's Id).
+     *
+     * @param context Faces context
+     * @param component UI component
+     * @param value original value
+     * @return
      */
     @Override
     public String getAsString(FacesContext context,
             UIComponent component, Object value)
             throws ConverterException {
-
         if (value == null) {
-            System.out.println("getAsString: value == null");
-            return "";
-        }
-        
-        if (!(value instanceof com.slyadz.hrlist.service.ws.Department)) {
-            System.out.println("getAsString: value is not instanceof ws.Department");
             return "";
         }
 
-        return ((com.slyadz.hrlist.service.ws.Department) value).getId().toString();
+        if (!(value instanceof Department)) {
+            return "";
+        }
+
+        return ((Department) value).getId().toString();
     }
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.service.rs;
 
 import java.util.HashSet;
@@ -12,7 +7,7 @@ import javax.ws.rs.core.Application;
 
 /**
  *
- * @A.G. Slyadz
+ * @author A.G. Slyadz
  */
 @ApplicationPath("api")
 public class DepartmentApplication extends Application {
@@ -21,6 +16,7 @@ public class DepartmentApplication extends Application {
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>();
         classes.add(DepartmentRS.class);
+        classes.add(EmployeeRS.class);        
         return classes;
     }
     

@@ -1,19 +1,6 @@
 ----------------------------------------------------------------
-Thu Mar 29 21:24:18 MSK 2018:
- Производится загрузка Derby версии The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): экземпляр a816c00e-0162-7300-daae-000007e74920
-в каталоге базы данных memory:C:\Users\user\Documents\NetBeansProjects\hrlist\hrlist-service\hrlist sun.misc.Launcher$AppClassLoader@6bc7c054 
-
-java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_144-b01
-user.dir=C:\Users\user\Documents\NetBeansProjects\hrlist\hrlist-service
-os.name=Windows 7
-os.arch=amd64
-os.version=6.1
-derby.system.home=null
-Запущен загрузчик классов базы данных - derby.database.classpath=''
-----------------------------------------------------------------
-Thu Mar 29 21:24:22 MSK 2018:
- Производится загрузка Derby версии The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): экземпляр d46b80cd-0162-7300-daae-000007e74920
+Tue Aug 14 10:19:32 MSK 2018:
+ Производится загрузка Derby версии The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): экземпляр a816c00e-0165-374d-d514-0000062711e8
 в каталоге базы данных memory:C:\Users\user\Documents\NetBeansProjects\hrlist\hrlist-service\hrlistIT sun.misc.Launcher$AppClassLoader@6bc7c054 
 
 java.vendor=Oracle Corporation

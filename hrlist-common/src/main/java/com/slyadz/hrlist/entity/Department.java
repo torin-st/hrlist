@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.entity;
 
 import java.io.Serializable;
@@ -21,7 +16,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 public class Department implements Serializable {
-
     private static final long serialVersionUID = -1142487944346587665L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,7 +23,7 @@ public class Department implements Serializable {
     @Size(max = 30)
     @NotNull
     private String name;
-  
+
     public Department() {
     }
 
@@ -57,25 +51,34 @@ public class Department implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
-        hash += name.hashCode();
+        hash += (name != null ? name.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-
-        boolean result = true;
-
+        // the same object
+        if (this == object) {
+            return true;
+        }
+        // not the instance of the same class
         if (!(object instanceof Department)) {
-            result = false;
+            return false;
         }
 
+        boolean result = true;        
         Department other = (Department) object;
-        if (result && !this.id.equals(other.id)) {
-            result = false;
+        
+        if (other.id == null){
+            result = (this.id == null);
+        } else {
+            result = (this.id != null ? this.id.equals(other.id) : false );
         }
-        if (result && !this.name.equals(other.name)) {
-            result = false;
+
+        if (result && (other.name == null)){
+            result = (this.name == null);
+        } else {
+            result = (this.name != null ? this.name.equals(other.name) : false );
         }
         return result;
     }
@@ -84,5 +87,4 @@ public class Department implements Serializable {
     public String toString() {
         return "com.slyadz.hrlist.entity.Department[id=" + id + ", name=" + name + "]";
     }
-
 }

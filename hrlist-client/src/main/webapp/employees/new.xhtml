@@ -5,16 +5,16 @@
                 template="../template.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core">
-    
+
     <ui:define name="htmlHead">
         <title>#{bundle.EmployeeNewTitle}</title>
     </ui:define>
-        
-    
+
+
     <ui:define name="htmlBody">
         <h1>#{bundle.EmployeeNewHeader}</h1>
-         <h:form id="employeeGrid">
-            <h:panelGrid id="employeeGrid" columns="2">
+        <h:form id="employeeGrid">
+            <h:panelGrid id="employeeGrid" columns="1">
                 <!-- name -->                
                 <h:outputLabel for="employeeNameInput" value="#{bundle.EmployeeNewName}" />
                 <h:inputText id="employeeNameInput" value="#{employeeBean.employee.name}" />
@@ -26,22 +26,29 @@
                 <!-- birthday -->
                 <h:outputLabel for="employeeBirthdayInput" value="#{bundle.EmployeeNewBirthday}" />
                 <h:inputText id="employeeBirthdayInput" value="#{employeeBean.employee.birthday}">
-                    <f:converter converterId="birthday"/>
+                    <f:convertDateTime type="date" />                        
                 </h:inputText>
-                <h:message for="employeeBirthdayInput"/>                                                
+                <h:message for="employeeBirthdayInput"/>  
+                <!-- Department -->
+                <h:outputLabel for="employeeDepartmentMenu" value="#{bundle.EmployeeNewDepartment}" />
+                <h:selectOneMenu id="employeeDepartmentMenu" value="#{employeeBean.employee.department}">
+                    <f:selectItems value="#{departmentBean.departments}" var="selDepartment" itemLabel="#{selDepartment.name}" itemValue="#{selDepartment}" />
+                </h:selectOneMenu>
+                <h:message for="employeeDepartmentMenu" />                                                                            
                 <f:facet name="footer">
                     <h:panelGroup style="display: block; text-align: right">
                         <h:commandButton id="createEmployeeButton"
-                                         action="#{employeeBean.createEmployee(employeeBean.employee)}"
+                                         action="#{employeeBean.create(employeeBean.employee)}"
                                          value="#{bundle.EmployeeNewButtonCreate}" />&nbsp;
-                       <h:commandButton id="cancelButton"
+                        <h:commandButton id="cancelButton"
                                          immediate="true"
-                                         action="/employees/index.xhtml?faces-redirect=true"
+                                         action="/employees/details.xhtml?faces-redirect=true"
                                          value="#{bundle.EmployeeNewButtonCancel}" />
                     </h:panelGroup>
                 </f:facet>                
             </h:panelGrid>
         </h:form>
+        <h:messages globalOnly="true" />
     </ui:define>
-    
+
 </ui:composition>

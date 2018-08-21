@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.slyadz.hrlist.service.ws;
+package com.slyadz.hrlist.entity;
 
-import com.slyadz.hrlist.entity.Department;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,7 +32,7 @@ public class Employee implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date birthday;
     private Float salary;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "DEPARTMENT_ID")
     private Department department;
 
@@ -57,10 +52,14 @@ public class Employee implements Serializable {
         this.birthday = birthday;
         this.salary = salary;
     }
-    
+
     public Employee(String name, Float salary) {
         this.name = name;
         this.salary = salary;
+    }
+
+    public Employee(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -78,7 +77,7 @@ public class Employee implements Serializable {
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
-    
+
     public Float getSalary() {
         return salary;
     }
@@ -102,37 +101,59 @@ public class Employee implements Serializable {
         hash += (name != null ? name.hashCode() : 0);
         hash += (birthday != null ? birthday.hashCode() : 0);
         hash += (salary != null ? salary.hashCode() : 0);
+        hash += (department != null ? department.hashCode() : 0);        
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-
-        boolean result = true;
-
+        // the same object
+        if (this == object) {
+            return true;
+        }
+        // not the instance of the same class
         if (!(object instanceof Employee)) {
-            result = false;
+            return false;
         }
 
+        boolean result = true;        
         Employee other = (Employee) object;
-        if (result && !this.id.equals(other.id)) {
-            result = false;
+        
+        if (other.id == null){
+            result = (this.id == null);
+        } else {
+            result = (this.id != null ? this.id.equals(other.id) : false );
         }
-        if (result && !this.name.equals(other.name)) {
-            result = false;
+
+        if (result && (other.name == null)){
+            result = (this.name == null);
+        } else {
+            result = (this.name != null ? this.name.equals(other.name) : false );
         }
-        if (result && !this.birthday.equals(other.birthday)) {
-            result = false;
+
+        if (result && (other.birthday == null)){
+            result = (this.birthday == null);
+        } else {
+            result = (this.birthday != null ? this.birthday.equals(other.birthday) : false );
         }
-        if (result && !this.salary.equals(other.salary)) {
-            result = false;
+
+        if (result && (other.salary == null)){
+            result = (this.salary == null);
+        } else {
+            result = (this.salary != null ? this.salary.equals(other.salary) : false );
         }
+        
+        if (result && (other.department == null)){
+            result = (this.department == null);
+        } else {
+            result = (this.department != null ? this.department.equals(other.department) : false );
+        }        
+        
         return result;
     }
 
     @Override
     public String toString() {
-        return "com.slyadz.hrlist.entity.Employee[id=" + id + ", name=" + name
-                + ", birtday=" + birthday + ", salary=" + salary + "]";
+        return "com.slyadz.hrlist.entity.Employee[id=" + id + ", dep=" + department + "]";
     }
 }

@@ -24,6 +24,7 @@
             <artifactId>hrlist-common</artifactId>
             <version>1.0</version>
             <type>jar</type>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -44,7 +45,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-<!--            <plugin>
+<!--     for JAX-WS client generation       <plugin>
                 <groupId>org.jvnet.jax-ws-commons</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
                 <version>2.3</version>

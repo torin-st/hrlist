@@ -16,26 +16,35 @@
         <h:form id="form">
             <h:dataTable var="department"
                          summary="#{bundle.IndexTableHeader}"
-                         value="#{departmentBean.getAllDepartments()}"
+                         value="#{departmentBean.departments}"
                          rules="all"
                          cellpadding="5">
+                <!--Id-->                
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="№" />
                     </f:facet>
                     <h:outputText value="#{department.id}" />
                 </h:column>
+                <!--Name-->
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.IndexColumnNameHeader}" />
                     </f:facet>
                     <h:outputText value="#{department.name}" />
                 </h:column>
+                <!--Average salary-->                
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{bundle.IndexColumnAvgSalaryHeader}" />
+                    </f:facet>
+                    <h:outputText value="#{departmentBean.findAvgSalary(department)}" />
+                </h:column>                
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.IndexColumnOperationHeader}" />
                     </f:facet>
-                    <h:commandButton value="#{bundle.IndexButtonDelete}" action="#{departmentBean.deleteDepartment}" />&nbsp;                                            
+                    <h:commandButton value="#{bundle.IndexButtonDelete}" action="#{departmentBean.delete}" />&nbsp;                                            
                     <h:commandButton value="#{bundle.IndexButtonEdit}" action="edit.xhtml?faces-redirect=true">
                         <f:setPropertyActionListener target="#{departmentBean.department}"
                                                      value="#{department}" />
@@ -47,7 +56,7 @@
                 </h:column>
                 <f:facet name="footer">
                     <h:panelGroup style="display: block; text-align: right">
-                        <h:commandButton value="#{bundle.IndexButtonNew}" action="#{departmentBean.prepareDepartment}" />
+                        <h:commandButton value="#{bundle.IndexButtonNew}" action="#{departmentBean.prepare}" />
                     </h:panelGroup>
                 </f:facet>
             </h:dataTable>

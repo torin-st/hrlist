@@ -6,9 +6,7 @@
 package com.slyadz.hrlist.client.web.managedbean;
 
 import com.slyadz.hrlist.entity.Department;
-import com.slyadz.hrlist.service.ws.Employee;
-import com.slyadz.hrlist.service.ws.EmployeeWS;
-import com.slyadz.hrlist.service.ws.EmployeeWSService;
+import com.slyadz.hrlist.entity.Employee;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -16,9 +14,14 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.ws.WebServiceRef;
-
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -28,11 +31,20 @@ import javax.xml.ws.WebServiceRef;
 @SessionScoped
 public class EmployeeBean implements Serializable {
 
+    private final String serviceURL = "http://localhost:8080/hrlist-service/api/employees";
+    private Client client;
     private Employee employee;
-    @WebServiceRef
-    private EmployeeWSService employeeWSService;
+    @Inject
+    private DepartmentBean departmentBean;
+    
+    public EmployeeBean() {}
 
-    public EmployeeBean() {
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public Employee getEmployee() {
@@ -45,106 +57,124 @@ public class EmployeeBean implements Serializable {
 
     @PostConstruct
     private void init() {
-        employee = new Employee();
+        setClient(ClientBuilder.newClient());
+        setEmployee(new Employee());
     }
 
     @PreDestroy
     private void clean() {
+        client.close();
     }
-    
-    public String prepareEmployee(){
+
+    public String prepare() {
         String navigation = "employeePrepared";
         setEmployee(new Employee());
         return navigation;
     }
 
-    public List<Employee> getAllEmployees() {
-                
-        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        return employeeWS.getAllEmployees();
+    public List<Employee> findAll() {
 
-    }
-    
-    public List<Employee> getEmployeesByDepartment(com.slyadz.hrlist.service.ws.Department department) {
-                
-        if (department == null){
-            throw new IllegalArgumentException("department is null!");
-        } 
-        
-        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        return employeeWS.getEmployeesByDepartment(department.getId());
+        return client.target(serviceURL)
+                .path("/")
+                .request(MediaType.APPLICATION_XML)
+                .get(new GenericType<List<Employee>>() {
+                });
+        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+        //return employeeWS.getAllEmployees();
 
     }
 
-    public String createEmployee(Employee employee) {
-        
+    public List<Employee> findByDepartment(Department department) {
+
+        if (department == null) {
+            throw new NullPointerException("department is null!");
+        }
+
+        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+        //return employeeWS.getEmployeesByDepartment(department.getId());
+        return client.target(serviceURL)
+                .path("/find_by_department_id/" + department.getId().toString())
+                .request(MediaType.APPLICATION_XML)
+                .get(new GenericType<List<Employee>>(){});        
+    }
+
+    public String create(Employee employee) {
         String navigation = "employeeError";
 
         if (employee == null) {
             return navigation;
         }
-        
-        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        boolean result = false;
-        
-        result = employeeWS.createEmployee(employee);
-        
-        if (result) {
+
+        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+        //boolean result = false;
+        //result = employeeWS.createEmployee(employee);
+        Response response = client.target(serviceURL)
+                .path("/")
+                .request(MediaType.APPLICATION_XML)
+                .post(Entity.entity(employee, MediaType.APPLICATION_XML),
+                        Response.class);
+
+        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
             navigation = "employeeCreated";
+            departmentBean.refreshAverageSalary();            
         } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't create employee."));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Server couldn't have deleted an employee with code " + response.getStatus()));
         }
-        
         return navigation;
     }
 
-    public String deleteEmployee() {
-        
+    public String delete() {
         String navigation = "employeeError";
         Employee employee = (Employee) FacesContext.getCurrentInstance()
                 .getExternalContext().getRequestMap().get("employee");
         if (employee == null) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't delete employee, employee == null."));            
+                    new FacesMessage("Couldn't delete employee - it's null."));
             return navigation;
         }
 
-        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        boolean result = false;
-        result = employeeWS.deleteEmployee(employee.getId());
-
-        if (result) {
+//        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+//        boolean result = false;
+//        result = employeeWS.deleteEmployee(employee.getId());
+        Response response = client.target(serviceURL)
+                .path(employee.getId().toString())
+                .request()
+                .delete();
+        if (Response.Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
             navigation = "employeeDeleted";
+            departmentBean.refreshAverageSalary();
         } else {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage("Server could't delete employee."));
-            navigation = "employeeError";
         }
         return navigation;
     }
 
-    public String updateEmployee(Employee employee) {
-        
+    public String update(Employee employee) {
         String navigation = "employeeError";
         if (employee == null) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't update employee, employee == null."));                        
+                    new FacesMessage("Couldn't update employee - it's null."));
             return navigation;
         }
 
-        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        boolean result = false;
-        result = employeeWS.updateEmployee(employee);
+//        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
+//        boolean result = false;
+//        result = employeeWS.updateEmployee(employee);
+        Response response
+                = client.target(serviceURL)
+                        .path("/")
+                        .request()
+                        .put(Entity.entity(employee, MediaType.APPLICATION_XML), Response.class);
 
-        if (result) {
+        if (Response.Status.SEE_OTHER.getStatusCode() == response.getStatus()) {
             navigation = "employeeUpdated";
+            departmentBean.refreshAverageSalary();            
         } else {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage("Server could't update employee."));
-            navigation = "employeeError";            
         }
-        
+
         return navigation;
     }
 }

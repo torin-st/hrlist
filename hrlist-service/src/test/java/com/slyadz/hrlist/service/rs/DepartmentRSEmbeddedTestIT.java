@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.service.rs;
 
 import com.slyadz.hrlist.entity.Department;
@@ -12,8 +7,6 @@ import java.util.Map;
 import javax.ejb.embeddable.EJBContainer;
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,23 +14,24 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @A.G. Slyadz
+ * @author A.G. Slyadz
  */
 public class DepartmentRSEmbeddedTestIT {
 
     private static EJBContainer ejbContainer;
     private static Context ctx;
-    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("hrlistIT");
     private static DepartmentRS departmentRS;
 
+    public DepartmentRSEmbeddedTestIT() {
+    }
+
     @BeforeClass
-    public static void setUpClass() throws NamingException {
+    public static void setUpClass() throws NamingException, Exception {
         Map<String, Object> properties = new HashMap<>();
         properties.put(EJBContainer.MODULES, new File[]{new File("target/classes"), new File("target/test-classes")});
         ejbContainer = EJBContainer.createEJBContainer(properties);
         ctx = ejbContainer.getContext();
         departmentRS = (DepartmentRS) ctx.lookup("java:global/classes/DepartmentRS");
-        departmentRS.setEntityManagerFactory(emf);
     }
 
     @AfterClass
@@ -45,58 +39,84 @@ public class DepartmentRSEmbeddedTestIT {
         if (ejbContainer != null) {
             ejbContainer.close();
         }
-        if (emf != null) {
-            if (emf.isOpen() == true) {
-                emf.close();
-            }
-        }
     }
 
     /**
-     * Creates 2 Department object, saves them to DB and trying get 1-st by real
-     * ID, and 2-nd by wrong ID (1-st object's ID).
+     * Creates an Department object, saves it to DB and gets it by ID.
      *
      */
     @Test
-    public void getDepartmentById() {
-        Department testDepartment1 = new Department("junitTestName1");
-        departmentRS.createDepartment(testDepartment1);
-        Department testDepartment2 = new Department("junitTestName2");
-        departmentRS.createDepartment(testDepartment2);
-
-        assertEquals(testDepartment1, departmentRS.getDepartmentById(testDepartment1.getId()));
-        assertNotEquals(testDepartment2, departmentRS.getDepartmentById(testDepartment1.getId()));
+    public void testCreate() {
+        System.out.println("=== create ====");
+        Department d1 = new Department("d1");
+        departmentRS.create(d1);
+        System.out.println("Created item: " + d1);
+        System.out.println("Finded item:" + departmentRS.findById(d1.getId()));
+        assertEquals(d1, departmentRS.findById(d1.getId()));
     }
 
     /**
-     * Gets current all departments count, creates 2 Department objects, saves
-     * them to DB and gets new all departments count.
-     *
+     * Creates an Department object, saves it to DB and gets it by id, add 1 to
+     * it's id and tries to get it by this new id
      */
     @Test
-    public void getAllDepartments() {
-        int startDerartmentsCount = departmentRS.getAllDepartments().size();
-        Department testDepartment3 = new Department("junitTestName3");
-        departmentRS.createDepartment(testDepartment3);
-        Department testDepartment4 = new Department("junitTestName4");
-        departmentRS.createDepartment(testDepartment4);
-        int endDepartmentsCount = departmentRS.getAllDepartments().size();
-
-        assertEquals(startDerartmentsCount + 2, endDepartmentsCount);
+    public void testFindById() {
+        System.out.println("=== findById ====");
+        Department d1 = new Department("d1");
+        departmentRS.create(d1);
+        System.out.println("Created item: " + d1);
+        System.out.println("Finded item: " + departmentRS.findById(d1.getId()));
+        assertEquals(d1, departmentRS.findById(d1.getId()));
+        Long wrongId = d1.getId() + 1;
+        assertNotEquals(d1.getId(), departmentRS.findById(wrongId));
     }
 
     /**
-     * Creates a Department object, saves it to DB and gets it by ID.
+     * Gets all items count, creates 2 new items and gets a new count. It must
+     * be old count + 2.
+     */
+    @Test
+    public void testFindAll() {
+        System.out.println("=== findAll ===");
+        int startDepartmentCount = departmentRS.findAll().size();
+        System.out.println("start count: " + startDepartmentCount);
+        Department d1 = new Department("d1");
+        departmentRS.create(d1);
+        Department d2 = new Department("d2");
+        departmentRS.create(d2);
+        int endDepartmentCount = departmentRS.findAll().size();
+        System.out.println("end count: " + endDepartmentCount);
+        assertEquals(startDepartmentCount + 2, endDepartmentCount);
+    }
+
+     /**
+     * Creates new item, persist it, changes it's name, update and compare.
      *
      */
     @Test
-    public void createDepartment() {
-        Department testDepartment5 = new Department("junitTestName5");
-        departmentRS.createDepartment(testDepartment5);
-
-        System.out.println(testDepartment5);
-        System.out.println(departmentRS.getDepartmentById(testDepartment5.getId()));
-
-        assertEquals(testDepartment5, departmentRS.getDepartmentById(testDepartment5.getId()));
+    public void testUpdate() {
+        System.out.println("=== update ===");
+        Department d1 = new Department("d1");
+        departmentRS.create(d1);
+        d1.setName("d1test");
+        departmentRS.update(d1);
+        System.out.println("Old name: d1");
+        System.out.println("New name: " + departmentRS.findById(d1.getId()).getName());
+        assertNotEquals("d1", departmentRS.findById(d1.getId()).getName());
     }
+
+    /**
+     * Creates new item, delete and tries to get it by id.
+     *
+     */
+    @Test
+    public void testDelete() {
+        System.out.println("=== delete ===");
+        Department d1 = new Department("d1");
+        departmentRS.create(d1);
+        Long oldId = d1.getId();
+        departmentRS.delete(oldId);
+        assertNotEquals(d1, departmentRS.findById(oldId));
+    }
+
 }

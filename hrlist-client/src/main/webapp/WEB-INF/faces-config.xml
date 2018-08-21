@@ -44,7 +44,7 @@
         </navigation-case>        
         <navigation-case>
             <from-outcome>employeeDeleted</from-outcome>
-            <to-view-id>/employees/index</to-view-id>
+            <to-view-id>/employees/details</to-view-id>
         </navigation-case>        
         <navigation-case>
             <from-outcome>employeePrepared</from-outcome>
@@ -53,7 +53,7 @@
         </navigation-case>                
         <navigation-case>
             <from-outcome>employeeCreated</from-outcome>
-            <to-view-id>/employees/index</to-view-id>
+            <to-view-id>/employees/details</to-view-id>
             <redirect />
         </navigation-case>        
         <navigation-case>
@@ -61,5 +61,16 @@
             <to-view-id>/employees/details</to-view-id>
             <redirect />
         </navigation-case>        
+        <navigation-case>
+            <from-outcome>employeeError</from-outcome>
+            <to-view-id>/employees/error</to-view-id>
+            <redirect />
+        </navigation-case>        
     </navigation-rule>
+    <!--Workaround for showing messages after redirect-->
+    <lifecycle>
+        <phase-listener>
+            com.slyadz.hrlist.client.web.listener.MessageHandler
+        </phase-listener>
+    </lifecycle>
 </faces-config>

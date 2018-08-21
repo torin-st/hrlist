@@ -1,19 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.client.web.managedbean;
 
 import com.slyadz.hrlist.entity.Department;
+import com.slyadz.hrlist.entity.Employee;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -32,91 +30,127 @@ public class DepartmentBean implements Serializable {
 
     private final String serviceURL = "http://localhost:8080/hrlist-service/api/departments";
     private Client client;
-    private com.slyadz.hrlist.service.ws.Department department;
-
-    public List<com.slyadz.hrlist.service.ws.Department> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<com.slyadz.hrlist.service.ws.Department> departments) {
-        this.departments = departments;
-    }
-    private List<com.slyadz.hrlist.service.ws.Department> departments;
+    private Department department;
+    private List<Department> departments;
+    private Map<Department, Float> averageSalary;
+    @Inject
+    private EmployeeBean employeeBean;
 
     public DepartmentBean() {
     }
 
-    public com.slyadz.hrlist.service.ws.Department getDepartment() {
+    public Map<Department, Float> getAverageSalary() {
+        return averageSalary;
+    }
+
+    public void setAverageSalary(Map<Department, Float> averageSalary) {
+        this.averageSalary = averageSalary;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
+    public Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(com.slyadz.hrlist.service.ws.Department department) {
+    public void setDepartment(Department department) {
         this.department = department;
     }
 
     @PostConstruct
     private void init() {
-        client = ClientBuilder.newClient();
-        department = new com.slyadz.hrlist.service.ws.Department();
-        departments = getAllDepartments();
-        System.out.println("DepartmentBean: postConstruct");
+        setClient(ClientBuilder.newClient());
+        setDepartment(new Department());
+        refreshDepartments();
+        refreshAverageSalary();
     }
 
     @PreDestroy
     private void clean() {
-        client.close();
-        System.out.println("DepartmentBean: preDestroy");        
+        getClient().close();
     }
-    
-    public String prepareDepartment(){
+
+    public String prepare() {
         String navigation = "departmentPrepared";
-        setDepartment(new com.slyadz.hrlist.service.ws.Department());
+        setDepartment(new Department());
         return navigation;
     }
 
-    public Department getDepartmentById(Long departmentId) {
+    /**
+     * Performs refreshing of departments. It's necessary after create, delete,
+     * update operations.
+     *
+     */
+    private void refreshDepartments() {
+        setDepartments(findAll());
+    }
+
+     /**
+     * Performs refreshing of average salary. It's necessary after create, delete,
+     * update operations.
+     *
+     */
+    void refreshAverageSalary() {
+            HashMap<Department, Float> hashMap = new HashMap<>();
+            //for all departmens, if too slow need refactoring for current department and futher with multithreading
+            for(Department d : getDepartments()){
+                Float avgSalary = 0f;
+                int employeeCount = 0;
+                //get all employees for current department
+                List<Employee> es = employeeBean.findByDepartment(d);
+                if (es == null) { // department has no employees
+                   hashMap.put(d, 0f);
+                   continue;
+                }
+                //count common salarty and employee count
+                for(Employee e : es){
+                    avgSalary += e.getSalary();
+                    employeeCount++;
+                }
+                //count average salary and put it to the hash map
+                avgSalary = avgSalary / employeeCount;
+                hashMap.put(d, avgSalary);
+            }
+            
+            setAverageSalary(hashMap);
+    }
+
+    public Department findById(Long departmentId) {
         return client.target(serviceURL)
                 .path(departmentId.toString())
                 .request(MediaType.APPLICATION_XML)
                 .get(Department.class);
-    }    
-    
-    public Department getDepartmentByName(String departmentName) {
-        return client.target(serviceURL)
-                .path("/getbyname/" + departmentName)
-                .request(MediaType.APPLICATION_XML)
-                .get(Department.class);
-    }
-    
-//    public List<Department> getAllDepartments() {
-//        return client.target(serviceURL)
-//                .path("/")
-//                .request(MediaType.APPLICATION_XML)
-//                .get(new GenericType<List<Department>>() {
-//                });
-//    }
-    public List<com.slyadz.hrlist.service.ws.Department> getAllDepartments() {
-        ArrayList<com.slyadz.hrlist.entity.Department> mock = client.target(serviceURL)
-                .path("/")
-                .request(MediaType.APPLICATION_XML)
-                .get(new GenericType<ArrayList<com.slyadz.hrlist.entity.Department>>() {
-                });
-        List<com.slyadz.hrlist.service.ws.Department> result = new ArrayList<>();
-        for (int i = 0; i < mock.size(); i++) {
-            com.slyadz.hrlist.entity.Department get = mock.get(i);
-            com.slyadz.hrlist.service.ws.Department t = new com.slyadz.hrlist.service.ws.Department();
-            t.setId(get.getId());
-            t.setName(get.getName());
-            result.add(t);            
-        }
-        return result;
     }
 
-    public String createDepartment(Department department) {
+    public List<Department> findAll() {
+        return client.target(serviceURL)
+                .path("/")
+                .request(MediaType.APPLICATION_XML)
+                .get(new GenericType<List<Department>>() {
+                });
+    }
+
+    public String create(Department department) {
+        String navigation = "departmentError";
+
         if (department == null) {
-            return "departmentError";
+            return navigation;
         }
-        String navigation;
+
         Response response = client.target(serviceURL)
                 .path("/")
                 .request(MediaType.APPLICATION_XML)
@@ -124,56 +158,77 @@ public class DepartmentBean implements Serializable {
                         Response.class);
         if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
             navigation = "departmentCreated";
+            refreshDepartments();
+            refreshAverageSalary();
         } else {
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null, new FacesMessage("Couldn't create department."));
-            navigation = "departmentError";
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage("Couldn't create department."));
         }
         return navigation;
     }
 
-    public String deleteDepartment() {
+    public String delete() {
         String navigation = "departmentError";
         Department department = (Department) FacesContext.getCurrentInstance()
                 .getExternalContext().getRequestMap().get("department");
         if (department == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage("Couldn't delete department - it's null."));
             return navigation;
         }
 
         Response response = client.target(serviceURL)
-                        .path(department.getId().toString())
-                        .request()
-                        .delete();
+                .path(department.getId().toString())
+                .request()
+                .delete();
         if (Response.Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
             navigation = "departmentDeleted";
+            refreshDepartments();
+            refreshAverageSalary();
         } else {
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null,
+            FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage("Couldn't delete department."));
-            navigation = "departmentError";
         }
         return navigation;
     }
 
-    public String updateDepartment(Department department) {
+    public String update(Department department) {
         String navigation = "departmentError";
         if (department == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage("Couldn't update department - it's null."));
             return navigation;
         }
 
-        Response response
-                = client.target(serviceURL)
-                        .path("/")
-                        .request()
-                        .put(Entity.entity(department, MediaType.APPLICATION_XML), Response.class);
+        Response response = client.target(serviceURL)
+                .path("/")
+                .request()
+                .put(Entity.entity(department, MediaType.APPLICATION_XML), Response.class);
         if (Response.Status.SEE_OTHER.getStatusCode() == response.getStatus()) {
             navigation = "departmentUpdated";
+            refreshDepartments();
+            refreshAverageSalary();
         } else {
-            System.out.println("==" + response.getStatus());
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null,
+            FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage("Couldn't update department."));
         }
         return navigation;
+    }
+
+    /**Finds average salary for current Department instance.
+     *
+     * @param department for search
+     * @return average salary
+     */
+    public float findAvgSalary(Department department) {
+        if (department == null){
+            throw new NullPointerException("department is null!");
+        }
+        
+        return getAverageSalary().entrySet().stream()
+                .filter(x -> x.getKey().equals(department))
+                .findFirst()
+                .get()
+                .getValue();
     }
 }

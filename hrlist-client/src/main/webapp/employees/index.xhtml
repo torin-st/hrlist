@@ -16,7 +16,7 @@
         <h:form id="form">
             <h:dataTable var="employee"
                          summary="#{bundle.EmployeeIndexTableHeader}"
-                         value="#{employeeBean.getAllEmployees()}"
+                         value="#{employeeBean.findAll()}"
                          rules="all"
                          cellpadding="5">
                 <h:column>
@@ -42,7 +42,7 @@
                         <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.birthday}">
-                       <!--<f:converter converterId="birthday"/>-->
+                        <f:convertDateTime type="date" />                        
                     </h:outputText>
                 </h:column>
                 <!-- Operations -->
