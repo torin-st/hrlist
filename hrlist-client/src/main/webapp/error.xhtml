@@ -2,17 +2,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="./template.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
-
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="./template.xhtml">
+    
     <ui:define name="htmlHead">
-        <title>Ошибка</title>
+        <title>#{bundle.ErrorTitle}</title>
     </ui:define>
-
 
     <ui:define name="htmlBody">
-        <h1>Произошла ошибка</h1>
+        <h1>#{bundle.ErrorHeader}</h1>
+        <p:messages globalOnly="true"/>
     </ui:define>
-
+    
 </ui:composition>

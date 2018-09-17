@@ -3,7 +3,6 @@ package com.slyadz.hrlist.service.rs;
 import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ejb.embeddable.EJBContainer;
@@ -98,32 +97,7 @@ public class EmployeeRSEmbeddedTestIT {
         assertEquals(startEmployeeCount + 2, endEmployeeCount);
     }
 
-    /**
-     * Creates 3 items: 2 with department and one with other. Compares.
-     * 
-     */
-    @Test
-    public void testFindByDepartmentId() {
-        System.out.println("=== findByDepartmentIdAll ===");
-        Department d1 = new Department("d100");
-        Department d2 = new Department("d200");        
-        Employee e1 = new Employee("e1");
-        e1.setDepartment(d1);
-        Employee e2 = new Employee("e2");
-        e2.setDepartment(d2);        
-        Employee e3 = new Employee("e3");
-        e3.setDepartment(d1);                
-        employeeRS.create(e1);
-        employeeRS.create(e2);
-        employeeRS.create(e3);
-        System.out.println(Arrays.toString(employeeRS.findAll().toArray()));
-        int countD100 = employeeRS.findByDepartmentId(d1.getId()).size();
-        int countD200 = employeeRS.findByDepartmentId(d2.getId()).size();
-        assertEquals(2, countD100);
-        assertEquals(1, countD200);        
-    }
-
-    /**
+     /**
      * Creates new item, persist it, changes it's name, update and compare.
      *
      */

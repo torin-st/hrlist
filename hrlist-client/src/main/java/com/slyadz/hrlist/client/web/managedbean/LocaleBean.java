@@ -1,5 +1,6 @@
 package com.slyadz.hrlist.client.web.managedbean;
 
+import com.slyadz.hrlist.client.web.interceptor.Loggable;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -16,6 +17,7 @@ import javax.inject.Named;
  */
 @Named
 @SessionScoped
+//@Loggable
 public class LocaleBean extends AbstractBean implements Serializable {
 
     private static final long serialVersionUID = -2181710426297811604L;
@@ -30,11 +32,11 @@ public class LocaleBean extends AbstractBean implements Serializable {
     @PostConstruct
     public void init() {
         //get current locale and set it up into bound property
-        locale = context().getViewRoot().getLocale();
+        locale = getContext().getViewRoot().getLocale();
         if (locale != null) {
             localeCode = locale.getLanguage();
             //also put it to the session
-            context().getExternalContext().getSessionMap().put("locale", localeCode);
+            getExternalContext().getSessionMap().put("locale", localeCode);
         }
         //prepopulate map of selectOneMenu
         countries = new LinkedHashMap<>();
@@ -62,12 +64,12 @@ public class LocaleBean extends AbstractBean implements Serializable {
     }
 
     public void componentInit(ComponentSystemEvent event) {
-        Map map = context().getExternalContext().getSessionMap();
+        Map map = getContext().getExternalContext().getSessionMap();
         //if session has locale value set it up to viewRoot and bound property
         if (map.containsKey("locale")) {
             for (Map.Entry<String, Locale> entry : countries.entrySet()) {
                 if (entry.getValue().toString().equals(map.get("locale").toString())) {
-                    context().getViewRoot().setLocale(entry.getValue());
+                    getContext().getViewRoot().setLocale(entry.getValue());
                 }
             }
 
@@ -80,11 +82,11 @@ public class LocaleBean extends AbstractBean implements Serializable {
 
     public void countryLocaleCodeChanged(ValueChangeEvent e) {
         String newLocaleValue = e.getNewValue().toString();
-        //set up new value into viewRoot and put in into session
+        //set up new value into viewRoot and put it into session
         for (Map.Entry<String, Locale> entry : countries.entrySet()) {
             if (entry.getValue().toString().equals(newLocaleValue)) {
-                context().getViewRoot().setLocale(entry.getValue());
-                context().getExternalContext().getSessionMap().put("locale", entry.getValue().getLanguage());
+                getContext().getViewRoot().setLocale(entry.getValue());
+                getExternalContext().getSessionMap().put("locale", entry.getValue().getLanguage());
             }
         }
     }

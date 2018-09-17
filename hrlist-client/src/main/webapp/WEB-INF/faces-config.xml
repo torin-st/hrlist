@@ -3,7 +3,6 @@
               xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
-    
     <application>
         <resource-bundle>
             <base-name>
@@ -19,51 +18,40 @@
         
     <navigation-rule>
         <navigation-case>
+            <from-outcome>needLogin</from-outcome>
+            <to-view-id>/login</to-view-id>
+            <redirect />
+        </navigation-case>                
+                
+        <navigation-case>
+            <from-outcome>departmentError</from-outcome>
+            <to-view-id>/error</to-view-id>
+            <redirect />
+        </navigation-case>                
+        <navigation-case>
             <from-outcome>departmentCreated</from-outcome>
             <to-view-id>/index</to-view-id>
             <redirect />
         </navigation-case>
         <navigation-case>
-            <from-outcome>departmentDeleted</from-outcome>
-            <to-view-id>/index</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>departmentError</from-outcome>
-            <to-view-id>/error</to-view-id>
-            <redirect />
-        </navigation-case>        
-        <navigation-case>
             <from-outcome>departmentUpdated</from-outcome>
             <to-view-id>/index</to-view-id>
             <redirect />
         </navigation-case>
+
         <navigation-case>
-            <from-outcome>departmentPrepared</from-outcome>
-            <to-view-id>/new</to-view-id>
+            <from-outcome>employeeError</from-outcome>
+            <to-view-id>/error</to-view-id>
             <redirect />
         </navigation-case>        
-        <navigation-case>
-            <from-outcome>employeeDeleted</from-outcome>
-            <to-view-id>/employees/details</to-view-id>
-        </navigation-case>        
-        <navigation-case>
-            <from-outcome>employeePrepared</from-outcome>
-            <to-view-id>/employees/new</to-view-id>
-            <redirect />
-        </navigation-case>                
         <navigation-case>
             <from-outcome>employeeCreated</from-outcome>
-            <to-view-id>/employees/details</to-view-id>
+            <to-view-id>/employees/index</to-view-id>
             <redirect />
         </navigation-case>        
         <navigation-case>
             <from-outcome>employeeUpdated</from-outcome>
-            <to-view-id>/employees/details</to-view-id>
-            <redirect />
-        </navigation-case>        
-        <navigation-case>
-            <from-outcome>employeeError</from-outcome>
-            <to-view-id>/employees/error</to-view-id>
+            <to-view-id>/employees/index</to-view-id>
             <redirect />
         </navigation-case>        
     </navigation-rule>

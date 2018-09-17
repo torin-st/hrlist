@@ -2,66 +2,173 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="../template.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../template.xhtml">
 
     <ui:define name="htmlHead">
         <title>#{bundle.EmployeeIndexTitle}</title>
     </ui:define>
 
-
     <ui:define name="htmlBody">
         <h1>#{bundle.EmployeeIndexHeader}</h1>
-        <h:form id="form">
-            <h:dataTable var="employee"
+        <h:form id="main">
+            <p:growl globalOnly="true" life="2000">
+                <p:autoUpdate />
+            </p:growl>
+            <p:dataTable id="employees"
+                         var="employee"
+                         sortBy="#{employee.department.name}"
                          summary="#{bundle.EmployeeIndexTableHeader}"
-                         value="#{employeeBean.findAll()}"
-                         rules="all"
-                         cellpadding="5">
-                <h:column>
+                         value="#{employeeBean.entities}"
+                         emptyMessage="#{bundle.EmployeeIndexTableNoRecord}">
+                <!-- Id -->                
+                <p:column width="60">
                     <f:facet name="header">
                         <h:outputText value="№" />
                     </f:facet>
                     <h:outputText value="#{employee.id}" />
-                </h:column>
-                <h:column>
+                </p:column>
+                <!-- Department -->
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{bundle.EmployeeIndexColumnDepartmentHeader}" />
+                    </f:facet>
+                    <h:outputText value="#{employee.department.name}" />
+                </p:column>
+                <!-- Name -->
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnNameHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.name}" />
-                </h:column>
-                <h:column>
+                </p:column>
+                <!-- Salary -->
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnSalaryHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.salary}" />
-                </h:column>                
-                <h:column>
+                </p:column>
+                <!-- Birthday -->
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.birthday}">
-                        <f:convertDateTime type="date" />                        
+                        <f:convertDateTime dateStyle="medium" />
                     </h:outputText>
-                </h:column>
+                </p:column>
                 <!-- Operations -->
-                <h:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnOperationHeader}" />
                     </f:facet>
-                    <h:commandButton value="#{bundle.EmployeeIndexButtonDelete}" action="#{employeeBean.deleteEmployee}" />&nbsp;
-                    <h:commandButton value="#{bundle.EmployeeIndexButtonEdit}" action="/employees/edit.xhtml?faces-redirect=true">
-                        <f:setPropertyActionListener target="#{employeeBean.employee}"
-                                                     value="#{employee}" />
-                    </h:commandButton>
-                </h:column>
+                    <!-- Delete -->
+                    <p:commandButton value="#{bundle.EmployeeIndexButtonDelete}"
+                                     action="#{employeeBean.delete(employee)}"
+                                     icon="ui-icon-trash" 
+                                     update="employees main:filterResult"
+                                     process="@this"/>&nbsp;                                                                                    
+                    <!-- Edit  -->
+                    <p:button value="#{bundle.EmployeeIndexButtonEdit}" outcome="/employees/edit" icon="ui-icon-pencil">
+                        <f:param name="employee_id" value="#{employee.id}" />
+                        <f:param name="from" value="/employees/index.xhtml?faces-redirect=true" />                        
+                    </p:button>
+                </p:column>
                 <f:facet name="footer">
-                    <h:panelGroup style="display: block; text-align: right">
-                        <h:commandButton value="#{bundle.EmployeeIndexButtonNew}" action="#{employeeBean.prepareEmployee}" />
+                    <h:panelGroup style="display: block; text-align: left">
+                        <!-- New -->
+                        <p:button value="#{bundle.EmployeeIndexButtonNew}" outcome="/employees/new" icon="ui-icon-document">
+                            <f:param name="from" value="/employees/index.xhtml?faces-redirect=true" />
+                        </p:button>&nbsp; 
+                        <!--Refresh-->
+                        <p:commandButton value="#{bundle.IndexButtonRefresh}"
+                                         action="#{departmentBean.refresh()}"
+                                         icon="ui-icon-refresh"
+                                         process="@this"
+                                         update="employees main:filterResult" />                                                                        
                     </h:panelGroup>
                 </f:facet>
-            </h:dataTable>
+            </p:dataTable>
+            <br />
+            <!-- Filter -->
+            <p:fieldset id="filter" legend="#{bundle.EmployeeIndexFilterHeader}" toggleable="true" toggleSpeed="500">
+                <h:panelGroup id="filterGroup">
+                    <!-- From -->
+                    #{bundle.EmployeeIndexFilterFrom}&nbsp;
+                    <p:calendar id="dateFrom"
+                                value="#{employeeBean.dateFrom}"
+                                immediate="true"
+                                navigator="true"
+                                yearRange="c-100:c" />&nbsp;
+                    <!-- Till -->
+                    #{bundle.EmployeeIndexFilterTill}&nbsp;
+                    <p:calendar id="dateTill"
+                                value="#{employeeBean.dateTill}"
+                                immediate="true"
+                                navigator="true"
+                                yearRange="c-100:c" />&nbsp;
+                    <!-- Filter -->
+                    <p:commandButton title="#{bundle.EmployeeIndexFilterButton}"
+                                     icon="ui-icon-search"
+                                     process="@this dateFrom dateTill"
+                                     update="filterResult"
+                                     />&nbsp;
+                    <!-- Clear -->
+                    <p:commandButton title="#{bundle.EmployeeIndexClearButton}"
+                                     action="#{employeeBean.clearFilter()}"
+                                     icon="ui-icon-cancel"
+                                     process="@this"
+                                     update="dateFrom dateTill filterResult"/> 
+                </h:panelGroup>
+                <br /><br />
+                <!-- Filter's result -->            
+                <h:panelGroup id="filterResult">
+                    <p:dataTable var="filteredEmployee"
+                                 value="#{employeeBean.filter()}"
+                                 emptyMessage="#{bundle.EmployeeIndexFilterNoRecord}">
+                        <!--Id-->                 
+                        <p:column width="60">
+                            <f:facet name="header">
+                                <h:outputText value="№" />
+                            </f:facet>
+                            <h:outputText value="#{filteredEmployee.id}" />
+                        </p:column>
+                        <!--Department--> 
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.EmployeeIndexColumnDepartmentHeader}" />
+                            </f:facet>
+                            <h:outputText value="#{filteredEmployee.department.name}" />
+                        </p:column>
+                        <!--Name--> 
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.EmployeeIndexColumnNameHeader}" />
+                            </f:facet>
+                            <h:outputText value="#{filteredEmployee.name}" />
+                        </p:column>
+                        <!--Salary--> 
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.EmployeeIndexColumnSalaryHeader}" />
+                            </f:facet>
+                            <h:outputText value="#{filteredEmployee.salary}" />
+                        </p:column>
+                        <!--Birthday--> 
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
+                            </f:facet>
+                            <h:outputText value="#{filteredEmployee.birthday}">
+                                <f:convertDateTime dateStyle="medium" />
+                            </h:outputText>
+                        </p:column>  
+                    </p:dataTable> 
+                </h:panelGroup>
+            </p:fieldset>
         </h:form>
     </ui:define>
 </ui:composition>

@@ -3,22 +3,32 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />  
         <h:outputStylesheet library="css" name="stylesheet.css"/>
+        <h:outputScript library="js" name="ru.js"/>
         <ui:insert name="htmlHead"><title>Template's title</title></ui:insert>
     </h:head>
     <h:body>
+        <f:event listener="#{localeBean.componentInit}" type="preRenderView" />
         <h:form>
-            <f:event listener="#{localeBean.componentInit}" type="preRenderView" />
-            <h:outputText value="#{bundle.TemplateLanguage}" />&nbsp;
-            <h:selectOneMenu value="#{localeBean.localeCode}" onchange="submit()" valueChangeListener="#{localeBean.countryLocaleCodeChanged}">
-                <f:selectItems value="#{localeBean.countriesInMap}" />
-            </h:selectOneMenu><br />
-            <h:outputText id="userName" value="#{bundle.TemplateUser} #{authBean.userName}" />&nbsp;<h:commandLink id="logout" action="#{authBean.userLogout()}" rendered="#{authBean.userName != '-'}" value="#{bundle.TemplateLogout}" /><br />
+            <p:menubar>
+                <p:menuitem value="#{bundle.TemplateDepartment}" url="/index.xhtml"/>
+                <p:menuitem value="#{bundle.TemplateEmployee}" url="/employees/index.xhtml"/>  
+                <f:facet name="options">
+                    <p:outputLabel for="languageSelect" value="#{bundle.TemplateLanguage}" class="option" />&nbsp;
+                    <p:selectOneMenu id="languageSelect" value="#{localeBean.localeCode}" onchange="submit()" valueChangeListener="#{localeBean.countryLocaleCodeChanged}">
+                        <f:selectItems value="#{localeBean.countriesInMap}" />
+                    </p:selectOneMenu>&nbsp;
+                    <h:outputText value="#{bundle.TemplateUser} #{authBean.userName}" class="option" />&nbsp;
+                    <p:commandLink action="#{authBean.userLogout()}" rendered="#{authBean.userName != '-'}" >
+                        <h:outputText value="#{bundle.TemplateLogout}"/>
+                    </p:commandLink>
+                </f:facet>
+            </p:menubar>
         </h:form>        
         <ui:insert name="htmlBody"><h1>Template's body</h1></ui:insert>
     </h:body>
 </html>
-

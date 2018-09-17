@@ -4,7 +4,15 @@ import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.service.persistence.EmployeeDAO;
 import java.io.Serializable;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -15,6 +23,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -89,21 +98,33 @@ public class EmployeeRS implements Serializable {
     }
     
      /**
-     * Fetches items by department's Id
+     * Fetches items by birthday's range
      *
+     * @param fromString
+     * @param tillString
      * @throws WebApplicationException(Response.Status.NOT_FOUND) if result is
      * null
      *
-     * @return all employees
+     * @return employees
      */
     @GET
-    @Path("/find_by_department_id/{id}")
+    @Path("/find_by_birthday_range")
     @Produces({MediaType.APPLICATION_XML})
-    public List<Employee> findByDepartmentId(@PathParam("id") Long departmentId) {
+    public List<Employee> findByBirthdayRange(@QueryParam("from") String fromString,
+                                              @QueryParam("till") String tillString) {
+        Date fromDate;                        
+        Date tillDate;
+        try {
+            fromDate = new SimpleDateFormat("dd.MM.yyyy", new Locale("ru")).parse(fromString);
+            tillDate = new SimpleDateFormat("dd.MM.yyyy", new Locale("ru")).parse(tillString);    
+        } catch (ParseException e) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+        
         List<Employee> result = null;
 
         try {
-            result = getEdao().findByDepartmentId(departmentId);
+           result = getEdao().findByBirthdayRange(fromDate, tillDate);
             if (result == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
@@ -112,7 +133,8 @@ public class EmployeeRS implements Serializable {
         }        
         
         return result;        
-    }    
+    }        
+    
     /**
      * Fetches all items from DB
      *

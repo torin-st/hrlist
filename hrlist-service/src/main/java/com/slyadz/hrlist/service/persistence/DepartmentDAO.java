@@ -13,7 +13,7 @@ import javax.inject.Inject;
  * @author A.G. Slyadz
  */
 @Stateless
-public class DepartmentDAO extends CommonDAO<Department> {
+public class DepartmentDAO extends AbstractDAO<Department> {
 
     @Inject
     @PersistenceUnitName

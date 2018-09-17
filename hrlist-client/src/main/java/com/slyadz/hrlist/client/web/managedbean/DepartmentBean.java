@@ -1,24 +1,21 @@
 package com.slyadz.hrlist.client.web.managedbean;
 
+import com.slyadz.hrlist.client.web.interceptor.Loggable;
 import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -26,17 +23,30 @@ import javax.ws.rs.core.Response;
  */
 @Named
 @SessionScoped
-public class DepartmentBean implements Serializable {
+@Loggable
+public class DepartmentBean extends AbstractEntityBean<Department> implements Serializable {
 
-    private final String serviceURL = "http://localhost:8080/hrlist-service/api/departments";
-    private Client client;
-    private Department department;
-    private List<Department> departments;
+    private final static String SERVICE_URL = "http://localhost:8080/hrlist-service/api/departments";
     private Map<Department, Float> averageSalary;
     @Inject
     private EmployeeBean employeeBean;
 
     public DepartmentBean() {
+    }
+
+    @Override
+    protected String getServiceURL() {
+        return SERVICE_URL;
+    }
+
+    @Override
+    protected String getOutcomePrefix() {
+        return "Department";
+    }
+
+    @Override
+    protected String getInstanceId(Department instance) {
+        return instance.getId().toString();
     }
 
     public Map<Department, Float> getAverageSalary() {
@@ -47,35 +57,10 @@ public class DepartmentBean implements Serializable {
         this.averageSalary = averageSalary;
     }
 
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public List<Department> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<Department> departments) {
-        this.departments = departments;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
     @PostConstruct
     private void init() {
         setClient(ClientBuilder.newClient());
-        setDepartment(new Department());
-        refreshDepartments();
+        refreshEntities();
         refreshAverageSalary();
     }
 
@@ -84,151 +69,148 @@ public class DepartmentBean implements Serializable {
         getClient().close();
     }
 
-    public String prepare() {
-        String navigation = "departmentPrepared";
-        setDepartment(new Department());
-        return navigation;
+    public String refresh(){
+        employeeBean.refreshEntities();
+        refreshEntities();
+        refreshAverageSalary();
+        return null;
+    }
+    /**
+     * Create new department.
+     *
+     * @param department for creation
+     * @return outcome for navigation
+     */
+    @Override
+    public String create(Department department) {
+        String result = super.create(department);
+        if (result.equals("departmentCreated")) {
+            refreshAverageSalary();
+        }
+        return result;
+    }
+
+    @Override
+    public List<Department> findAll() {
+        List<Department> result = null;
+        //perform get request
+        try {
+            result = getClient().target(getServiceURL())
+                    .path("/")
+                    .request(MediaType.APPLICATION_XML)
+                    .get(new GenericType<List<Department>>() {
+                    }); //Doesn't work in AbstractEntityBean - find out why
+        } catch (Exception e) {
+            message(null, "CouldNotFindAll" + getOutcomePrefix(), new Object[]{e.getMessage()});
+            return null;
+        }
+        return result;
     }
 
     /**
-     * Performs refreshing of departments. It's necessary after create, delete,
-     * update operations.
+     * Delete a department. Get it from request map.
      *
+     * @param instance
+     * @return outcome for navigation
      */
-    private void refreshDepartments() {
-        setDepartments(findAll());
+    @Override
+    public String delete(Department instance) {
+        String result = getOutcomePrefix().toLowerCase() + "Error";
+        //check access
+        Principal principal = getExternalContext().getUserPrincipal();
+        if (principal == null) {
+            result = "needLogin";
+            return result;
+        }
+        if (instance == null) {
+            message(null, "CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessage("InstanceIsNull")});
+            return result;
+        }        
+        //check employees
+        List<Employee> es = null;
+        es = employeeBean.findByDepartment(instance);
+        if (es != null && es.isEmpty() == false){
+            message(null, "CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessage("DepartmentHasEmployees")});
+            return result;            
+        }
+        
+        result = super.delete(instance);
+        if (result.equals("departmentDeleted")) {
+            refreshAverageSalary();
+        }
+        return null;
     }
 
-     /**
-     * Performs refreshing of average salary. It's necessary after create, delete,
-     * update operations.
+    /**
+     * Update a particular department.
+     *
+     * @param department for update
+     * @return outcome for navigation
+     */
+    @Override
+    public String update(Department department) {
+        String result = super.update(department);
+
+        if (result.equals("departmentUpdated")) {
+            refreshAverageSalary();
+        }
+        return result;
+    }
+
+    /**
+     * Perform refreshing of average salary. It's necessary after create,
+     * delete, update operations.
      *
      */
     void refreshAverageSalary() {
-            HashMap<Department, Float> hashMap = new HashMap<>();
-            //for all departmens, if too slow need refactoring for current department and futher with multithreading
-            for(Department d : getDepartments()){
-                Float avgSalary = 0f;
-                int employeeCount = 0;
-                //get all employees for current department
-                List<Employee> es = employeeBean.findByDepartment(d);
-                if (es == null) { // department has no employees
-                   hashMap.put(d, 0f);
-                   continue;
-                }
-                //count common salarty and employee count
-                for(Employee e : es){
-                    avgSalary += e.getSalary();
-                    employeeCount++;
-                }
-                //count average salary and put it to the hash map
-                avgSalary = avgSalary / employeeCount;
-                hashMap.put(d, avgSalary);
+        if (getEntities() == null)
+        {
+            return;
+        }
+        
+        HashMap<Department, Float> hashMap = new HashMap<>();
+        //for all departmens, if too slow need refactoring for current department and futher with multithreading
+        for (Department d : getEntities()) {
+            float avgSalary = 0f;
+            int employeeCount = 0;
+            //get all employees for current department
+            List<Employee> es = employeeBean.findByDepartment(d);
+            if (es == null) { // department has no employees
+                hashMap.put(d, 0.0f);
+                continue;
             }
-            
-            setAverageSalary(hashMap);
+            if (es.isEmpty()) { // department has no employees
+                hashMap.put(d, 0f);
+                continue;
+            }            
+            //count common salarty and employee count
+            for (Employee e : es) {
+                avgSalary += e.getSalary();
+                employeeCount++;
+            }
+            //count average salary and put it to the hash map
+            avgSalary = avgSalary / employeeCount;
+            hashMap.put(d, avgSalary);
+        }
+        setAverageSalary(hashMap);
     }
 
-    public Department findById(Long departmentId) {
-        return client.target(serviceURL)
-                .path(departmentId.toString())
-                .request(MediaType.APPLICATION_XML)
-                .get(Department.class);
-    }
-
-    public List<Department> findAll() {
-        return client.target(serviceURL)
-                .path("/")
-                .request(MediaType.APPLICATION_XML)
-                .get(new GenericType<List<Department>>() {
-                });
-    }
-
-    public String create(Department department) {
-        String navigation = "departmentError";
-
-        if (department == null) {
-            return navigation;
-        }
-
-        Response response = client.target(serviceURL)
-                .path("/")
-                .request(MediaType.APPLICATION_XML)
-                .post(Entity.entity(department, MediaType.APPLICATION_XML),
-                        Response.class);
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-            navigation = "departmentCreated";
-            refreshDepartments();
-            refreshAverageSalary();
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't create department."));
-        }
-        return navigation;
-    }
-
-    public String delete() {
-        String navigation = "departmentError";
-        Department department = (Department) FacesContext.getCurrentInstance()
-                .getExternalContext().getRequestMap().get("department");
-        if (department == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't delete department - it's null."));
-            return navigation;
-        }
-
-        Response response = client.target(serviceURL)
-                .path(department.getId().toString())
-                .request()
-                .delete();
-        if (Response.Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
-            navigation = "departmentDeleted";
-            refreshDepartments();
-            refreshAverageSalary();
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't delete department."));
-        }
-        return navigation;
-    }
-
-    public String update(Department department) {
-        String navigation = "departmentError";
-        if (department == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't update department - it's null."));
-            return navigation;
-        }
-
-        Response response = client.target(serviceURL)
-                .path("/")
-                .request()
-                .put(Entity.entity(department, MediaType.APPLICATION_XML), Response.class);
-        if (Response.Status.SEE_OTHER.getStatusCode() == response.getStatus()) {
-            navigation = "departmentUpdated";
-            refreshDepartments();
-            refreshAverageSalary();
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't update department."));
-        }
-        return navigation;
-    }
-
-    /**Finds average salary for current Department instance.
+    /**
+     * Find average salary for a particular department
      *
      * @param department for search
      * @return average salary
      */
     public float findAvgSalary(Department department) {
-        if (department == null){
+        if (department == null) {
             throw new NullPointerException("department is null!");
         }
-        
+
         return getAverageSalary().entrySet().stream()
                 .filter(x -> x.getKey().equals(department))
                 .findFirst()
                 .get()
                 .getValue();
     }
+    
 }

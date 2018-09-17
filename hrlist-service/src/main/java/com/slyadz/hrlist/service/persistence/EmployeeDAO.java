@@ -5,7 +5,10 @@ import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.entity.Employee_;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
@@ -20,7 +23,7 @@ import javax.persistence.criteria.Root;
  * @author A.G. Slyadz
  */
 @Stateless
-public class EmployeeDAO extends CommonDAO<Employee> {
+public class EmployeeDAO extends AbstractDAO<Employee> {
 
     @Inject
     @PersistenceUnitName
@@ -67,20 +70,22 @@ public class EmployeeDAO extends CommonDAO<Employee> {
     }
 
      /**
-     * Persist the department to db
+     * Fetches items by birthday range
      *
-     * @param departmentId
+     * @param fromDate
+     * @param tillDate
      * @return list of employees by id
      * @throws java.io.IOException
      */    
-    public List<Employee> findByDepartmentId(Long departmentId) throws IOException {
+    public List<Employee> findByBirthdayRange(Date fromDate, Date tillDate) throws IOException {
         List <Employee> result = null;
         try {
             CriteriaBuilder cb = getEm().getCriteriaBuilder();
             CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
             Root<Employee> e = cq.from(Employee.class);
             cq.select(e);
-            cq.where(cb.equal(e.get(Employee_.department).get(Department_.id), departmentId));
+            //cq.where( cb.between(e.<Long>get(Employee_.id), (Long)751L, (Long)751L) );
+            cq.where( cb.between(e.<Date>get(Employee_.birthday), fromDate, tillDate) );
             getEt().begin();
             result = getEm().createQuery(cq).getResultList();
             getEt().commit();
@@ -89,8 +94,7 @@ public class EmployeeDAO extends CommonDAO<Employee> {
             throw new IOException(e.getMessage());
         }
         return result;
-    }
-
+    }    
     /**
      * Closes EntityManager and EntityMangerFactory if they are not null.
      */

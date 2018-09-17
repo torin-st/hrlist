@@ -9,11 +9,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Workaround for showing messages after redirect.
- * 
- * Enables messages to be rendered on different pages from which they were set.
+ * Workaround for showing messanables messages to be rendered on different pages from which they were set.
  * To produce this behavior, this class acts as a <code>PhaseListener</code>.
  *
  * This is performed by moving the FacesMessage objects:
@@ -65,10 +64,19 @@ public class MessageHandler implements PhaseListener {
      */
     @Override
     public void beforePhase(PhaseEvent event) {
+        
+        if (event.getPhaseId() == PhaseId.RESTORE_VIEW){
+            System.out.println("ServletPath: " + event.getFacesContext().getExternalContext().getRequestServletPath());
+            HttpServletRequest request = (HttpServletRequest) event.getFacesContext().getExternalContext().getRequest();        
+            System.out.println("Method: " + request.getMethod());                    
+        }
+        
+        System.out.println("before: " + event.getPhaseId());
+        
         if (event.getPhaseId() == PhaseId.RENDER_RESPONSE) {
             FacesContext facesContext = event.getFacesContext();
             restoreMessages(facesContext);
-        }
+        } 
     }
 
     /**
@@ -78,13 +86,18 @@ public class MessageHandler implements PhaseListener {
      */
     @Override
     public void afterPhase(PhaseEvent event) {
+        System.out.println("after: " + event.getPhaseId());
         if (event.getPhaseId() == PhaseId.APPLY_REQUEST_VALUES
                 || event.getPhaseId() == PhaseId.PROCESS_VALIDATIONS
-                || event.getPhaseId() == PhaseId.INVOKE_APPLICATION) {
-
+                || event.getPhaseId() == PhaseId.INVOKE_APPLICATION) {        
             FacesContext facesContext = event.getFacesContext();
             saveMessages(facesContext);
         }
+               
+        if (event.getPhaseId() == PhaseId.RENDER_RESPONSE) {
+            System.out.println("isValidationFailed: " + event.getFacesContext().isValidationFailed());            
+            System.out.println("-----------------------------------------------------------------------------------------");
+        }         
     }
 
     /**
@@ -95,19 +108,19 @@ public class MessageHandler implements PhaseListener {
      */
     private int saveMessages(FacesContext facesContext) {
         // remove messages from the context
-        List messages = new ArrayList();
-        for (Iterator i = facesContext.getMessages(null); i.hasNext();) {
-            messages.add(i.next());
+        List<FacesMessage> messages = new ArrayList<>();
+        for (Iterator<FacesMessage> i = facesContext.getMessages(null); i.hasNext();) {
+            messages.add((FacesMessage)i.next());
             i.remove();
         }
         // store them in the session
         if (messages.isEmpty()) {
             return 0;
         }
-        Map sessionMap = facesContext.getExternalContext().getSessionMap();
+        Map<String, Object> sessionMap = facesContext.getExternalContext().getSessionMap();
         // if there already are messages
         @SuppressWarnings("unchecked")
-        List existingMessages = (List) sessionMap.get(sessionToken);
+        List<FacesMessage> existingMessages = (List<FacesMessage>) sessionMap.get(sessionToken);
         if (existingMessages != null) {
             existingMessages.addAll(messages);
         } else {

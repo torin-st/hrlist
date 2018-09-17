@@ -10,7 +10,10 @@
             <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/hrlist;create=true"/>
             <property name="javax.persistence.jdbc.user" value="app"/>
-            <property name="javax.persistence.jdbc.password" value="app"/>      
+            <property name="javax.persistence.jdbc.password" value="app"/>    
+            <!-- for sql-queries loging -->            
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>  
         </properties>
     </persistence-unit>
     <persistence-unit name="hrlistIT" transaction-type="RESOURCE_LOCAL">

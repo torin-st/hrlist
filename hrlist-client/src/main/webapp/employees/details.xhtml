@@ -2,66 +2,88 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="../template.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../template.xhtml">                
 
     <ui:define name="htmlHead">
         <title>#{bundle.EmployeeIndexTitle}</title>
     </ui:define>
 
-
     <ui:define name="htmlBody">
-        <h1>#{bundle.EmployeeIndexHeader += " [" += departmentBean.department.name += "]"}</h1>
-        <h:form id="form">
-            <h:dataTable var="employee"
+        <f:metadata>
+            <f:viewParam name="department_id" value="#{departmentManager.department}" required="true"/>            
+        </f:metadata>    
+        <h1>#{bundle.EmployeeIndexHeader += " [" += departmentManager.department.name += "]"}</h1>
+        <h:form>
+            <p:growl globalOnly="true" life="2000">
+                <p:autoUpdate />
+            </p:growl>
+            <p:dataTable id="employees"
+                         var="employee"
                          summary="#{bundle.EmployeeIndexTableHeader}"
-                         value="#{employeeBean.findByDepartment(departmentBean.department)}"
-                         rules="all"
-                         cellpadding="5">
-                <h:column>
+                         value="#{employeeBean.findByDepartment(departmentManager.department)}"
+                         emptyMessage="#{bundle.EmployeeIndexTableNoRecord}">
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="№" />
                     </f:facet>
                     <h:outputText value="#{employee.id}" />
-                </h:column>
-                <h:column>
+                </p:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnNameHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.name}" />
-                </h:column>
-                <h:column>
+                </p:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnSalaryHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.salary}" />
-                </h:column>                
-                <h:column>
+                </p:column>                
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnBirthdayHeader}" />
                     </f:facet>
                     <h:outputText value="#{employee.birthday}">
-                        <f:convertDateTime type="date" />
+                        <f:convertDateTime dateStyle="medium" />
                     </h:outputText>
-                </h:column>
+                </p:column>
                 <!-- Operations -->
-                <h:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.EmployeeIndexColumnOperationHeader}" />
                     </f:facet>
-                    <h:commandButton value="#{bundle.EmployeeIndexButtonDelete}" action="#{employeeBean.delete}" />&nbsp;
-                    <h:commandButton value="#{bundle.EmployeeIndexButtonEdit}" action="/employees/edit.xhtml?faces-redirect=true">
-                        <f:setPropertyActionListener target="#{employeeBean.employee}"
-                                                     value="#{employee}" />
-                    </h:commandButton>
-                </h:column>
+                    <!-- Delete -->
+                    <p:commandButton value="#{bundle.EmployeeIndexButtonDelete}"
+                                     action="#{employeeBean.delete(employee)}"
+                                     icon="ui-icon-trash"
+                                     update="employees"
+                                     process="@this"/>&nbsp;                                                                
+                    <!-- Edit  -->
+                    <p:button value="#{bundle.EmployeeIndexButtonEdit}" outcome="/employees/edit" icon="ui-icon-pencil">
+                        <f:param name="employee_id" value="#{employee.id}" />
+                        <f:param name="from" value="#{'/employees/details.xhtml?faces-redirect=true&amp;department_id=' += departmentManager.department.id.toString()}" />                        
+                    </p:button>                    
+                </p:column>
                 <f:facet name="footer">
-                    <h:panelGroup style="display: block; text-align: right">
-                        <h:commandButton value="#{bundle.EmployeeIndexButtonNew}" action="#{employeeBean.prepare}" />
+                    <h:panelGroup style="display: block; text-align: left">
+                        <!-- New -->
+                        <p:button value="#{bundle.EmployeeIndexButtonNew}" outcome="/employees/new" icon="ui-icon-document">
+                            <f:param name="from" value="#{'/employees/details.xhtml?faces-redirect=true&amp;department_id=' += departmentManager.department.id.toString()}" />
+                        </p:button>&nbsp;
+                        <!--Refresh-->
+                        <p:commandButton value="#{bundle.IndexButtonRefresh}"
+                                         action="#{departmentBean.refresh()}"
+                                         icon="ui-icon-refresh"
+                                         update="employees"
+                                         process="@this"/>                                                
                     </h:panelGroup>
                 </f:facet>
-            </h:dataTable>
+            </p:dataTable>
         </h:form>
     </ui:define>
+    
 </ui:composition>

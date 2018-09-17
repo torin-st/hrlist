@@ -14,7 +14,7 @@ import javax.persistence.criteria.CriteriaQuery;
  * @author A.G. Slyadz
  * @param <T> entity type
  */
-public abstract class CommonDAO<T> {
+public abstract class AbstractDAO<T> {
 
     private Class<T> entityClass;
     private EntityManagerFactory emf;

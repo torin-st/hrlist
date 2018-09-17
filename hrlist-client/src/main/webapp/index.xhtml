@@ -2,64 +2,76 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="./template.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="./template.xhtml">
 
     <ui:define name="htmlHead">
         <title>#{bundle.IndexTitle}</title>
     </ui:define>
 
-
     <ui:define name="htmlBody">
         <h1>#{bundle.IndexHeader}</h1>
-        <h:form id="form">
-            <h:dataTable var="department"
-                         summary="#{bundle.IndexTableHeader}"
-                         value="#{departmentBean.departments}"
-                         rules="all"
-                         cellpadding="5">
+        <h:form>
+            <p:growl globalOnly="true" life="2000">
+                <p:autoUpdate />
+            </p:growl>
+            <p:dataTable id="departments" var="department" summary="#{bundle.IndexTableHeader}" value="#{departmentBean.entities}" emptyMessage="#{bundle.IndexTableNoRecord}">
                 <!--Id-->                
-                <h:column>
+                <p:column width="60">
                     <f:facet name="header">
                         <h:outputText value="№" />
                     </f:facet>
                     <h:outputText value="#{department.id}" />
-                </h:column>
+                </p:column>
                 <!--Name-->
-                <h:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.IndexColumnNameHeader}" />
                     </f:facet>
                     <h:outputText value="#{department.name}" />
-                </h:column>
+                </p:column>
                 <!--Average salary-->                
-                <h:column>
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.IndexColumnAvgSalaryHeader}" />
                     </f:facet>
                     <h:outputText value="#{departmentBean.findAvgSalary(department)}" />
-                </h:column>                
-                <h:column>
+                </p:column>                
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{bundle.IndexColumnOperationHeader}" />
                     </f:facet>
-                    <h:commandButton value="#{bundle.IndexButtonDelete}" action="#{departmentBean.delete}" />&nbsp;                                            
-                    <h:commandButton value="#{bundle.IndexButtonEdit}" action="edit.xhtml?faces-redirect=true">
-                        <f:setPropertyActionListener target="#{departmentBean.department}"
-                                                     value="#{department}" />
-                    </h:commandButton>&nbsp;
-                    <h:commandButton value="#{bundle.IndexButtonEmployees}" action="/employees/details.xhtml?faces-redirect=true">
-                        <f:setPropertyActionListener target="#{departmentBean.department}"
-                                                     value="#{department}" />
-                    </h:commandButton>                    
-                </h:column>
+                    <!--Delete-->
+                    <p:commandButton value="#{bundle.IndexButtonDelete}"
+                                     action="#{departmentBean.delete(department)}"
+                                     icon="ui-icon-trash"
+                                     update="departments"
+                                     process="@this"/>&nbsp;                                            
+                    <!--Edit-->
+                    <p:button value="#{bundle.IndexButtonEdit}" outcome="/edit" icon="ui-icon-pencil">
+                        <f:param name="id" value="#{department.id}" />
+                    </p:button>&nbsp;     
+                    <!--Details-->
+                    <p:button value="#{bundle.IndexButtonEmployees}" outcome="/employees/details" icon="ui-icon-folder-open">
+                        <f:param name="department_id" value="#{department.id}" />
+                    </p:button>     
+                </p:column>
                 <f:facet name="footer">
-                    <h:panelGroup style="display: block; text-align: right">
-                        <h:commandButton value="#{bundle.IndexButtonNew}" action="#{departmentBean.prepare}" />
+                    <h:panelGroup style="display: block; text-align: left">
+                        <!--New-->
+                        <p:button value="#{bundle.IndexButtonNew}" outcome="/new" icon="ui-icon-document" />&nbsp;     
+                        <!--Refresh-->
+                        <p:commandButton value="#{bundle.IndexButtonRefresh}"
+                                         action="#{departmentBean.refresh()}"
+                                         icon="ui-icon-refresh"
+                                         update="departments"
+                                         process="@this"/>                        
                     </h:panelGroup>
                 </f:facet>
-            </h:dataTable>
+            </p:dataTable>
         </h:form>
     </ui:define>
+
 </ui:composition>

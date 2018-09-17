@@ -4,12 +4,45 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
+    <!-- For correct date showing -->
+    <context-param>
+        <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+    </context-param>    
+    <context-param>
+        <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>        
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>omega</param-value>
+    </context-param>
+    
+    <error-page>
+        <location>/error.xhtml</location>
+    </error-page>
+    
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>font/woff</mime-type>
+    </mime-mapping>    
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/vnd.ms-fontobject</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/font-sfnt</mime-type>
+    </mime-mapping>
+    
     <security-constraint>
         <display-name>Area 51</display-name>
         <web-resource-collection>
             <web-resource-name>Protected</web-resource-name>
             <url-pattern>/new.xhtml</url-pattern>
+            <url-pattern>/employees/new.xhtml</url-pattern>            
             <url-pattern>/edit.xhtml</url-pattern>            
+            <url-pattern>/employees/edit.xhtml</url-pattern>                        
         </web-resource-collection>
         <auth-constraint>
             <role-name>TutorialUser</role-name>
@@ -22,7 +55,8 @@
             <form-login-page>/login.xhtml</form-login-page>
             <form-error-page>/error.xhtml</form-error-page>
         </form-login-config>
-    </login-config>      
+    </login-config>   
+       
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>

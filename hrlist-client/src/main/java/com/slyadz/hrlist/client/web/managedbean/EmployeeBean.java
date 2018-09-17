@@ -1,27 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.slyadz.hrlist.client.web.managedbean;
 
+import com.slyadz.hrlist.client.web.interceptor.Loggable;
 import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -29,152 +23,132 @@ import javax.ws.rs.core.Response;
  */
 @Named
 @SessionScoped
-public class EmployeeBean implements Serializable {
+@Loggable
+public class EmployeeBean extends AbstractEntityBean<Employee> implements Serializable {
 
-    private final String serviceURL = "http://localhost:8080/hrlist-service/api/employees";
-    private Client client;
-    private Employee employee;
+    private final static String SERVICE_URL = "http://localhost:8080/hrlist-service/api/employees";
+    private Date dateFrom;
+    private Date dateTill;
     @Inject
     private DepartmentBean departmentBean;
-    
-    public EmployeeBean() {}
 
-    public Client getClient() {
-        return client;
+    public EmployeeBean() {
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    @Override
+    protected String getServiceURL() {
+        return SERVICE_URL;
     }
 
-    public Employee getEmployee() {
-        return employee;
+    @Override
+    protected String getOutcomePrefix() {
+        return "Employee";
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    @Override
+    protected String getInstanceId(Employee instance) {
+        return instance.getId().toString();
+    }
+
+    public Date getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(Date dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public Date getDateTill() {
+        return dateTill;
+    }
+
+    public void setDateTill(Date dateTill) {
+        this.dateTill = dateTill;
     }
 
     @PostConstruct
     private void init() {
         setClient(ClientBuilder.newClient());
-        setEmployee(new Employee());
+        refreshEntities();
+        setDateFrom(new Date());
+        setDateTill(new Date());
     }
 
     @PreDestroy
     private void clean() {
-        client.close();
+        getClient().close();
     }
 
-    public String prepare() {
-        String navigation = "employeePrepared";
-        setEmployee(new Employee());
-        return navigation;
-    }
+    public List<Employee> filter() {
+        if (getDateFrom() == null || getDateTill() == null) {
+            return null;
+        }
 
-    public List<Employee> findAll() {
-
-        return client.target(serviceURL)
-                .path("/")
+        return getClient().target(SERVICE_URL)
+                .path("/find_by_birthday_range")
+                .queryParam("from", new SimpleDateFormat("dd.MM.yyyy").format(getDateFrom()))
+                .queryParam("till", new SimpleDateFormat("dd.MM.yyyy").format(getDateTill()))
                 .request(MediaType.APPLICATION_XML)
                 .get(new GenericType<List<Employee>>() {
                 });
-        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        //return employeeWS.getAllEmployees();
+    }
+    
+    public String clearFilter() {
+        setDateFrom(new Date());
+        setDateTill(new Date());
+        return null;
+    }
 
+    @Override
+    public List<Employee> findAll() {
+        List<Employee> result = null;
+        //perform get request
+        try {
+            result = getClient().target(getServiceURL())
+                    .path("/")
+                    .request(MediaType.APPLICATION_XML)
+                    .get(new GenericType<List<Employee>>() {
+                    }); //Doesn't work in AbstractEntityBean - find out why
+        } catch (Exception e) {
+            message(null, "CouldNotFindAll" + getOutcomePrefix(), new Object[]{e.getMessage()});
+            return null;
+        }
+        return result;
     }
 
     public List<Employee> findByDepartment(Department department) {
-
         if (department == null) {
-            throw new NullPointerException("department is null!");
+            throw new NullPointerException(getLocalizedMessage("InstanceIsNull"));
         }
-
-        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        //return employeeWS.getEmployeesByDepartment(department.getId());
-        return client.target(serviceURL)
-                .path("/find_by_department_id/" + department.getId().toString())
-                .request(MediaType.APPLICATION_XML)
-                .get(new GenericType<List<Employee>>(){});        
+        //from bean
+        return getEntities().stream().filter(e -> e.getDepartment().equals(department)).collect(Collectors.toList());
     }
 
-    public String create(Employee employee) {
-        String navigation = "employeeError";
-
-        if (employee == null) {
-            return navigation;
-        }
-
-        //EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-        //boolean result = false;
-        //result = employeeWS.createEmployee(employee);
-        Response response = client.target(serviceURL)
-                .path("/")
-                .request(MediaType.APPLICATION_XML)
-                .post(Entity.entity(employee, MediaType.APPLICATION_XML),
-                        Response.class);
-
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-            navigation = "employeeCreated";
-            departmentBean.refreshAverageSalary();            
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Server couldn't have deleted an employee with code " + response.getStatus()));
-        }
-        return navigation;
-    }
-
-    public String delete() {
-        String navigation = "employeeError";
-        Employee employee = (Employee) FacesContext.getCurrentInstance()
-                .getExternalContext().getRequestMap().get("employee");
-        if (employee == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't delete employee - it's null."));
-            return navigation;
-        }
-
-//        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-//        boolean result = false;
-//        result = employeeWS.deleteEmployee(employee.getId());
-        Response response = client.target(serviceURL)
-                .path(employee.getId().toString())
-                .request()
-                .delete();
-        if (Response.Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
-            navigation = "employeeDeleted";
+    public String create(Employee employee, String fromOutcome) {
+        String result = super.create(employee);
+        if (result.equals("employeeCreated")) {
             departmentBean.refreshAverageSalary();
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Server could't delete employee."));
+            result = fromOutcome;            
         }
-        return navigation;
+        return result;
     }
 
-    public String update(Employee employee) {
-        String navigation = "employeeError";
-        if (employee == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Couldn't update employee - it's null."));
-            return navigation;
+    @Override
+    public String delete(Employee instance) {
+        String result = super.delete(instance);
+        if (result.equals("employeeDeleted")) {
+            departmentBean.refreshAverageSalary();
+            return null;
         }
+        return result;
+    }
 
-//        EmployeeWS employeeWS = employeeWSService.getEmployeeWSPort();
-//        boolean result = false;
-//        result = employeeWS.updateEmployee(employee);
-        Response response
-                = client.target(serviceURL)
-                        .path("/")
-                        .request()
-                        .put(Entity.entity(employee, MediaType.APPLICATION_XML), Response.class);
-
-        if (Response.Status.SEE_OTHER.getStatusCode() == response.getStatus()) {
-            navigation = "employeeUpdated";
-            departmentBean.refreshAverageSalary();            
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Server could't update employee."));
+    public String update(Employee employee, String fromOutcome) {
+        String result = super.update(employee);
+        if (result.equals("employeeUpdated")) {
+            departmentBean.refreshAverageSalary();
+            result = fromOutcome;
         }
-
-        return navigation;
+        return result;
     }
 }

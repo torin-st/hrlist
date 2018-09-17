@@ -1,40 +1,43 @@
-/**
- * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
- *
- * You may not modify, use, reproduce, or distribute this software except in
- * compliance with the terms of the License at:
- * http://java.net/projects/javaeetutorial/pages/BerkeleyLicense
- */
 package com.slyadz.hrlist.client.web.managedbean;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.inject.Named;
 
 /**
- * <p>Abstract base class for managed beans to share utility methods.</p>
+ * <p>
+ * Abstract base class for managed beans to share utility methods.</p>
+ *
  */
-@Named
-@SessionScoped
-public class AbstractBean implements Serializable {
-
-    private static final long serialVersionUID = -3375564172975657665L;
-
-
+public abstract class AbstractBean {
     /**
      * @return the <code>FacesContext</code> instance for the current request.
      */
-    protected FacesContext context() {
-        return (FacesContext.getCurrentInstance());
+    protected FacesContext getContext() {
+        return FacesContext.getCurrentInstance();
+    }
+    
+    protected ExternalContext getExternalContext() {
+        return getContext().getExternalContext();
     }
 
+    protected String getLocalizedMessage(String key) {
+        String text;
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle("com.slyadz.hrlist.client.web.message.message",
+                    getContext().getViewRoot().getLocale());
+            text = bundle.getString(key);
+        } catch (Exception e) {
+            text = "???" + key + "???";
+        }
+        return text;
+    }
     /**
-     * <p>Add a localized message to the
-     * <code>FacesContext</code> for the current request.</p>
+     * <p>
+     * Add a localized message to the <code>FacesContext</code> for the current
+     * request.</p>
      *
      * @param clientId Client identifier of the component this message relates
      * to, or <code>null</code> for global messages
@@ -42,24 +45,15 @@ public class AbstractBean implements Serializable {
      */
     protected void message(String clientId, String key) {
         // Look up the requested message text
-        String text;
-
-        try {
-            ResourceBundle bundle = ResourceBundle.getBundle(
-                    "com.slyadz.hrlist.client.web.message.message",
-                    context().getViewRoot().getLocale());
-            text = bundle.getString(key);
-        } catch (Exception e) {
-            text = "???" + key + "???";
-        }
-
+        String text = getLocalizedMessage(key);
         // Construct and add a FacesMessage containing it
-        context().addMessage(clientId, new FacesMessage(text));
+        getContext().addMessage(clientId, new FacesMessage(text));
     }
 
     /**
-     * <p>Add a localized message to the
-     * <code>FacesContext</code> for the current request.</p>
+     * <p>
+     * Add a localized message to the <code>FacesContext</code> for the current
+     * request.</p>
      *
      * @param clientId Client identifier of the component this message relates
      * to, or <code>null</code> for global messages
@@ -69,23 +63,12 @@ public class AbstractBean implements Serializable {
      */
     protected void message(String clientId, String key, Object[] params) {
         // Look up the requested message text
-        String text;
-
-        try {
-            ResourceBundle bundle = ResourceBundle.getBundle(
-                    "com.slyadz.hrlist.client.web.message.message",
-                    context().getViewRoot().getLocale());
-            text = bundle.getString(key);
-        } catch (Exception e) {
-            text = "???" + key + "???";
-        }
-
+        String text = getLocalizedMessage(key);
         // Perform the requested substitutions
         if ((params != null) && (params.length > 0)) {
             text = MessageFormat.format(text, params);
         }
-
         // Construct and add a FacesMessage containing it
-        context().addMessage(clientId, new FacesMessage(text));
-    }
+        getContext().addMessage(clientId, new FacesMessage(text));
+    }    
 }
