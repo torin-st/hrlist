@@ -13,9 +13,11 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 /**
  *
@@ -68,7 +70,10 @@ public class EmployeeBean extends AbstractEntityBean<Employee> implements Serial
 
     @PostConstruct
     private void init() {
-        setClient(ClientBuilder.newClient());
+        HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("test", "123");
+        Client client = ClientBuilder.newClient();
+        client.register(feature);
+        setClient(client);
         refreshEntities();
         setDateFrom(new Date());
         setDateTill(new Date());

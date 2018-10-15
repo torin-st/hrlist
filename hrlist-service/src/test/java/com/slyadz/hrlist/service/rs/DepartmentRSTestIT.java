@@ -1,4 +1,4 @@
-package com.slyadz.hrlist.service.rs;
+ package com.slyadz.hrlist.service.rs;
 
 import com.slyadz.hrlist.entity.Department;
 import java.io.File;
@@ -13,16 +13,16 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * Perform integration test for DepartmentRS class
  * @author A.G. Slyadz
  */
-public class DepartmentRSEmbeddedTestIT {
+public class DepartmentRSTestIT {
 
     private static EJBContainer ejbContainer;
     private static Context ctx;
     private static DepartmentRS departmentRS;
 
-    public DepartmentRSEmbeddedTestIT() {
+    public DepartmentRSTestIT() {
     }
 
     @BeforeClass
@@ -42,7 +42,7 @@ public class DepartmentRSEmbeddedTestIT {
     }
 
     /**
-     * Creates an Department object, saves it to DB and gets it by ID.
+     * Create a Department instance, persist it and get it by the Id.
      *
      */
     @Test
@@ -56,8 +56,8 @@ public class DepartmentRSEmbeddedTestIT {
     }
 
     /**
-     * Creates an Department object, saves it to DB and gets it by id, add 1 to
-     * it's id and tries to get it by this new id
+     * Create a Department instance, persist it and get it by id.
+     * 
      */
     @Test
     public void testFindById() {
@@ -67,13 +67,12 @@ public class DepartmentRSEmbeddedTestIT {
         System.out.println("Created item: " + d1);
         System.out.println("Finded item: " + departmentRS.findById(d1.getId()));
         assertEquals(d1, departmentRS.findById(d1.getId()));
-        Long wrongId = d1.getId() + 1;
-        assertNotEquals(d1.getId(), departmentRS.findById(wrongId));
     }
-
+   
     /**
-     * Gets all items count, creates 2 new items and gets a new count. It must
-     * be old count + 2.
+     * Count all departments, create 2 new items and get a new count. It
+     * must be =  old count + 2.
+     * 
      */
     @Test
     public void testFindAll() {
@@ -90,7 +89,8 @@ public class DepartmentRSEmbeddedTestIT {
     }
 
      /**
-     * Creates new item, persist it, changes it's name, update and compare.
+     * Create a new Department instance, persist it, change it's name, update
+     * and compare.
      *
      */
     @Test
@@ -106,17 +106,22 @@ public class DepartmentRSEmbeddedTestIT {
     }
 
     /**
-     * Creates new item, delete and tries to get it by id.
+     * Count all departments, create a new Department instance, persist it, 
+     * delete it and compare count.
      *
      */
     @Test
     public void testDelete() {
         System.out.println("=== delete ===");
+        int count = departmentRS.findAll().size();
+        int startCount = count;
+        System.out.println("start count: " + count);
         Department d1 = new Department("d1");
         departmentRS.create(d1);
-        Long oldId = d1.getId();
-        departmentRS.delete(oldId);
-        assertNotEquals(d1, departmentRS.findById(oldId));
+        departmentRS.delete(d1.getId());        
+        count = departmentRS.findAll().size();        
+        System.out.println("end count: " + count);        
+        assertEquals(startCount, count);        
     }
 
 }
