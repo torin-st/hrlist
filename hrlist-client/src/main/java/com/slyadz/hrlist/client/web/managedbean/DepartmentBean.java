@@ -33,6 +33,22 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
     @Inject
     private EmployeeBean employeeBean;
 
+    public Map<Department, Float> getAverageSalary() {
+        return averageSalary;
+    }
+
+    public void setAverageSalary(Map<Department, Float> averageSalary) {
+        this.averageSalary = averageSalary;
+    }
+    
+    public EmployeeBean getEmployeeBean() {
+        return employeeBean;
+    }
+
+    public void setEmployeeBean(EmployeeBean employeeBean) {
+        this.employeeBean = employeeBean;
+    }
+
     public DepartmentBean() {
     }
 
@@ -51,14 +67,6 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
         return instance.getId().toString();
     }
 
-    public Map<Department, Float> getAverageSalary() {
-        return averageSalary;
-    }
-
-    public void setAverageSalary(Map<Department, Float> averageSalary) {
-        this.averageSalary = averageSalary;
-    }
-
     @PostConstruct
     private void init() {
         HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("test", "123");
@@ -75,26 +83,54 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
     }
 
     public String refresh(){
-        employeeBean.refreshEntities();
+        getEmployeeBean().refreshEntities();
         refreshEntities();
         refreshAverageSalary();
         return null;
     }
+        
     /**
-     * Create new department.
+     * Parent's Create-method wrapper for the best testability
+     * @param department
+     * @return outcome for navigation
+     */
+    public String parentCreateWrapper(Department department) {
+        return super.create(department);
+    }    
+    
+    /**
+     * Create a  new department.
      *
      * @param department for creation
      * @return outcome for navigation
      */
     @Override
     public String create(Department department) {
-        String result = super.create(department);
-        if (result.equals("departmentCreated")) {
+        String result = parentCreateWrapper(department);        
+
+        if (result != null && result.equals("departmentCreated")) {
             refreshAverageSalary();
         }
+        
         return result;
     }
 
+    /**
+     * Parent's message-method wrapper for the best testability
+     * @param key - String key for international messages
+     * @param params - details
+     */
+    public void parentMessageWrapper(String key, Object[] params){
+       message(null, key, params);        
+    }    
+    
+     /**
+     * Parent's getLocalizedMessage-method wrapper for the best testability
+     * @param key - String key for international messages
+     */
+    public String getLocalizedMessageWrapper(String key){
+       return getLocalizedMessage(key);
+    }    
     @Override
     public List<Department> findAll() {
         List<Department> result = null;
@@ -106,12 +142,20 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
                     .get(new GenericType<List<Department>>() {
                     }); //Doesn't work in AbstractEntityBean - find out why
         } catch (Exception e) {
-            message(null, "CouldNotFindAll" + getOutcomePrefix(), new Object[]{e.getMessage()});
+            parentMessageWrapper("CouldNotFindAll" + getOutcomePrefix(), new Object[]{e.getMessage()});
             return null;
         }
         return result;
     }
 
+    /**
+     * Parent's Delete-method wrapper for the best testability
+     * @param department
+     * @return outcome for navigation
+     */
+    public String parentDeleteWrapper(Department department) {
+        return super.delete(department);
+    }        
     /**
      * Delete a department. Get it from request map.
      *
@@ -128,24 +172,32 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
             return result;
         }
         if (instance == null) {
-            message(null, "CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessage("InstanceIsNull")});
+            parentMessageWrapper("CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessageWrapper("InstanceIsNull")});
             return result;
         }        
         //check employees
         List<Employee> es = null;
-        es = employeeBean.findByDepartment(instance);
+        es = getEmployeeBean().findByDepartment(instance);
         if (es != null && es.isEmpty() == false){
-            message(null, "CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessage("DepartmentHasEmployees")});
+            parentMessageWrapper("CouldNotDelete" + getOutcomePrefix(), new Object[]{getLocalizedMessageWrapper("DepartmentHasEmployees")});
             return result;            
         }
         
-        result = super.delete(instance);
+        result = parentDeleteWrapper(instance);
         if (result.equals("departmentDeleted")) {
             refreshAverageSalary();
         }
         return null;
     }
 
+    /**
+     * Parent's Update-method wrapper for the best testability
+     * @param department
+     * @return outcome for navigation
+     */
+    public String parentUpdateWrapper(Department department) {
+        return super.update(department);
+    }            
     /**
      * Update a particular department.
      *
@@ -154,7 +206,7 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
      */
     @Override
     public String update(Department department) {
-        String result = super.update(department);
+        String result = parentUpdateWrapper(department);
 
         if (result.equals("departmentUpdated")) {
             refreshAverageSalary();
@@ -163,23 +215,30 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
     }
 
     /**
+     * Parent's getEntities-method wrapper for the best testability
+     * @return list of departments
+     */
+    public List<Department> getEntitiesWrapper() {
+        return super.getEntities();
+    }                
+    /**
      * Perform refreshing of average salary. It's necessary after create,
      * delete, update operations.
      *
      */
     void refreshAverageSalary() {
-        if (getEntities() == null)
+        if (getEntitiesWrapper() == null)
         {
             return;
         }
         
         HashMap<Department, Float> hashMap = new HashMap<>();
         //for all departmens, if too slow need refactoring for current department and futher with multithreading
-        for (Department d : getEntities()) {
+        for (Department d : getEntitiesWrapper()) {
             float avgSalary = 0f;
             int employeeCount = 0;
             //get all employees for current department
-            List<Employee> es = employeeBean.findByDepartment(d);
+            List<Employee> es = getEmployeeBean().findByDepartment(d);
             if (es == null) { // department has no employees
                 hashMap.put(d, 0.0f);
                 continue;
@@ -188,7 +247,7 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
                 hashMap.put(d, 0f);
                 continue;
             }            
-            //count common salarty and employee count
+            //count common salary and employee count
             for (Employee e : es) {
                 avgSalary += e.getSalary();
                 employeeCount++;

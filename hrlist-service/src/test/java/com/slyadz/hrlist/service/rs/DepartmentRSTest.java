@@ -13,7 +13,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
 /**
- * Perform module test for DepartmentRS class
+ * Perform module test for the DepartmentRS class
  *
  * @author A.G. Slyadz
  */

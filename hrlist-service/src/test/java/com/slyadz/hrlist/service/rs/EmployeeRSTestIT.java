@@ -17,13 +17,13 @@ import static org.junit.Assert.*;
  *
  * @author A.G. Slyadz
  */
-public class EmployeeRSEmbeddedTestIT {
+public class EmployeeRSTestIT {
 
     private static EJBContainer ejbContainer;
     private static Context ctx;
     private static EmployeeRS employeeRS;
 
-    public EmployeeRSEmbeddedTestIT() {
+    public EmployeeRSTestIT() {
     }
 
     @BeforeClass

@@ -1,1 +1,4 @@
 /hrlist-service/nbproject/
+/hrlist-client/nbproject/
+target/
+*.iml

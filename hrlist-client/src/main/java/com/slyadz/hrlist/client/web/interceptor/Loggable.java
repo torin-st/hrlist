@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 import javax.interceptor.InterceptorBinding;
 
 /**
+ * An interface to mark a class for logging
  * 
  * @author A.G. Slyadz
  */

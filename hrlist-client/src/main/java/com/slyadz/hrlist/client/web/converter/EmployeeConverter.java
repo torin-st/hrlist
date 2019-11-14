@@ -9,9 +9,9 @@ import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Converter class for a Department type.
- * 
- * @author A. G. Slyadz
+ * Converter class for a Employee type.
+ *
+ * @author A.G. Slyadz
  */
 @FacesConverter(forClass = Employee.class)
 public class EmployeeConverter implements Converter {
@@ -22,12 +22,12 @@ public class EmployeeConverter implements Converter {
     }
 
     /**
-     * Converts into Department instance from id.
+     * Converts into Employee instance from id.
      *
      * @param context Faces context
      * @param component UI component
      * @param newValue new value
-     * @return 
+     * @return
      */
     @Override
     public Object getAsObject(FacesContext context,
@@ -37,14 +37,13 @@ public class EmployeeConverter implements Converter {
             throw new IllegalArgumentException("New value is empty!");
 
         }
-        //Workaround to "inject" DepartmentBean instance 
+        //Workaround to "inject" EmployeeBean instance 
         EmployeeBean employeeBean = context.getApplication().evaluateExpressionGet(context, "#{employeeBean}", EmployeeBean.class);
         Employee convertedValue = null;
-        
+
         if (employeeBean == null) {
             throw new NullPointerException("employeeBean is null!");
-        } else
-        {
+        } else {
             convertedValue = employeeBean.getEntities().stream()
                     .filter(x -> newValue.equals(x.getId().toString()))
                     .findAny()
@@ -52,14 +51,14 @@ public class EmployeeConverter implements Converter {
         }
 
         if (convertedValue == null) {
-                throw new NullPointerException("Converted value is null after request!");
+            throw new NullPointerException("Converted value is null after request!");
         }
 
         return convertedValue;
     }
 
     /**
-     * Converts into String from a Department instance (uses it's Id).
+     * Converts into String from a Employee instance (uses it's Id).
      *
      * @param context Faces context
      * @param component UI component

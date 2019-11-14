@@ -5,7 +5,6 @@ import com.slyadz.hrlist.service.persistence.DepartmentDAO;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
