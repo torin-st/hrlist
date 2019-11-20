@@ -1,14 +1,10 @@
 package com.slyadz.hrlist.service.persistence;
 
-import com.slyadz.hrlist.entity.Department_;
-import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.entity.Employee_;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
@@ -46,6 +42,7 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @PostConstruct
     private void init() {
         super.init(Employee.class, getNameReturner().getPersistenceUnitName());
+        System.out.println("******************** EmployeeDAO ********************");                                
     }
 
     /**
@@ -58,8 +55,8 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @Override
     public Long create(Employee employee) throws IOException {
         try {
+            System.out.println("e creation");            
             getEt().begin();
-            employee.setDepartment(getEm().find(Department.class, employee.getDepartment().getId()));
             getEm().persist(employee);
             getEt().commit();
         } catch (Exception e) {
@@ -84,7 +81,6 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
             CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
             Root<Employee> e = cq.from(Employee.class);
             cq.select(e);
-            //cq.where( cb.between(e.<Long>get(Employee_.id), (Long)751L, (Long)751L) );
             cq.where( cb.between(e.<Date>get(Employee_.birthday), fromDate, tillDate) );
             getEt().begin();
             result = getEm().createQuery(cq).getResultList();
@@ -102,6 +98,7 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @Override
     protected void clean() {
         super.clean();
+        System.out.println("******************** EmployeeDAO clean ********************");                                        
     }
 
 }

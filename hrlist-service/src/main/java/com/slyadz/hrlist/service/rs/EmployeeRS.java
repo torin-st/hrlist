@@ -9,8 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -29,12 +31,22 @@ import javax.ws.rs.core.Response;
  *
  * @author A.G. Slyadz
  */
-@Stateless
+//@Stateless
 @Path("employees")
 public class EmployeeRS implements Serializable {
     
-    @Inject
+    @EJB
     public EmployeeDAO edao;
+    
+    @PostConstruct
+    private void init() {
+        System.out.println("******************** EmployeeRS ********************");                                
+    }    
+
+    @PreDestroy
+    private void clear() {
+        System.out.println("******************** EmployeeRS clear ********************");                                
+    }        
 
     public EmployeeDAO getEdao() {
         return edao;

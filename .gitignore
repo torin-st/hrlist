@@ -2,3 +2,5 @@
 /hrlist-client/nbproject/
 target/
 *.iml
+nb-configuration.xml
+derby.log

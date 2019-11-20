@@ -36,6 +36,7 @@ public class DepartmentDAO extends AbstractDAO<Department> {
     @PostConstruct
     private void init() {
         super.init(Department.class, getNameReturner().getPersistenceUnitName());
+        System.out.println("******************** DepartmentDAO ********************");                        
     }
 
     /**
@@ -45,14 +46,16 @@ public class DepartmentDAO extends AbstractDAO<Department> {
      * @return department's Id
      * @throws java.io.IOException
      */
+    @Override
     public Long create(Department department) throws IOException {
         try {
+            System.out.println("d creation");
             getEt().begin();
             getEm().persist(department);
             getEt().commit();
         } catch (Exception e) {
             getEt().rollback();
-            throw new IOException("create() error: " + e.getMessage());
+            throw new IOException(e.getMessage());
         }
         return department.getId();
     }
@@ -61,8 +64,10 @@ public class DepartmentDAO extends AbstractDAO<Department> {
      * Closes EntityManager and EntityMangerFactory if they are not null.
      */
     @PreDestroy
+    @Override
     protected void clean() {
         super.clean();
+        System.out.println("******************** DepartmentDAO clean ********************");                                
     }
 
 }

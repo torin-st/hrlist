@@ -2,7 +2,6 @@ package com.slyadz.hrlist.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +31,7 @@ public class Employee implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date birthday;
     private Float salary;
-    @ManyToOne(cascade = {CascadeType.PERSIST})
+    @ManyToOne
     @JoinColumn(name = "DEPARTMENT_ID")
     private Department department;
 
@@ -154,6 +153,6 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "com.slyadz.hrlist.entity.Employee[id=" + id + ", dep=" + department + "]";
+        return "com.slyadz.hrlist.entity.Employee[id=" + id + ", name=" + name + ", dep=" + department + "]";
     }
 }

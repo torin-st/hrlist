@@ -5,8 +5,9 @@ import com.slyadz.hrlist.service.persistence.DepartmentDAO;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,13 +25,23 @@ import javax.ws.rs.core.Response;
  *
  * @author A.G. Slyadz
  */
-@Stateless
+//@Stateless
 @Path("departments")
 public class DepartmentRS implements Serializable {
 
-    @Inject
+    @EJB
     public DepartmentDAO ddao;
+    
+    @PostConstruct
+    private void init() {
+        System.out.println("******************** DepartmentRS ********************");                                
+    }    
 
+    @PreDestroy
+    private void clear() {
+        System.out.println("******************** DepartmentRS clear ********************");                                
+    }    
+    
     /**
      * Get a ddao value
      *
@@ -49,6 +60,12 @@ public class DepartmentRS implements Serializable {
         this.ddao = ddao;
     }
 
+    @GET
+    @Path("test")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String test() {
+        return "Hello, world!";
+    }    
     /**
      * Create a new Department
      *
@@ -60,7 +77,7 @@ public class DepartmentRS implements Serializable {
      * @return Response - created(URI.create("/" + departmentId))
      */
     @POST
-    @Path("/")
+    //@Path("/")
     public Response create(Department department) {
         if (department == null) {
             throw new WebApplicationException("department can not be null", Response.Status.BAD_REQUEST);
@@ -68,7 +85,7 @@ public class DepartmentRS implements Serializable {
         
         try {
             Long departmentId = getDdao().create(department);
-            return Response.created(URI.create("/" + departmentId)).build();
+            return Response.created(URI.create("/" + departmentId)).entity(department).build();
         } catch (Exception e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -118,7 +135,7 @@ public class DepartmentRS implements Serializable {
      * @return List<Department>
      */
     @GET
-    @Path("/")
+    //@Path("/")
     @Produces({MediaType.APPLICATION_XML})
     public List<Department> findAll() {
         List<Department> result = null;
@@ -147,7 +164,7 @@ public class DepartmentRS implements Serializable {
      * @return Response ok().status(303)
      */
     @PUT
-    @Path("/")
+    //@Path("/")
     @Consumes({MediaType.APPLICATION_XML})
     public Response update(Department department) {
         if (department == null) {
