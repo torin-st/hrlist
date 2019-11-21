@@ -65,7 +65,6 @@ public class EmployeeRS implements Serializable {
      * @return Response
      */
     @POST
-    @Path("/")
     public Response create(Employee employee) {
         Response result = null;
         
@@ -152,7 +151,6 @@ public class EmployeeRS implements Serializable {
      * @return all employees
      */
     @GET
-    @Path("/")
     @Produces({MediaType.APPLICATION_XML})
     public List<Employee> findAll() {
         List<Employee> result = null;
@@ -180,7 +178,6 @@ public class EmployeeRS implements Serializable {
      * @return Response
      */
     @PUT
-    @Path("/")
     @Consumes({MediaType.APPLICATION_XML})
     public Response update(Employee employee) {
         if (employee == null) {

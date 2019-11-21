@@ -36,12 +36,13 @@ public class DBPopulator implements Serializable {
     @PostConstruct
     private void populateDB() {
         System.out.println("******************** DBPopulator ********************");                
-        Department d1 = new Department("Отдел продаж");
+        Department d1 = new Department("Department1");
         try {
             departmentDAO.create(d1);
         } catch (Exception e) {
             System.out.println("error while populating DB: " + e.getMessage());
         }    
+//        Department d1 = new Department("Отдел продаж");        
 //        Department d2 = new Department("Отдел закупок");
 //        Department d3 = new Department("Бухгалтерия");
 //        Department d4 = new Department("Администрация");   
