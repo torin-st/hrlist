@@ -3,8 +3,7 @@ package com.slyadz.hrlist.service.persistence;
 import javax.enterprise.inject.Default;
 
 /**
- *
- * @author A.G. Slyadz
+ * Return persistent unit name
  */
 @PersistenceUnitName @Default
 public class Hrlist implements NameReturner {
