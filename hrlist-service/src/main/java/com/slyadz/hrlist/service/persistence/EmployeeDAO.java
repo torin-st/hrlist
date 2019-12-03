@@ -1,5 +1,6 @@
 package com.slyadz.hrlist.service.persistence;
 
+import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.entity.Employee_;
 import java.io.IOException;
@@ -15,8 +16,6 @@ import javax.persistence.criteria.Root;
 
 /**
  * DAO class for Employee entity
- *
- * @author A.G. Slyadz
  */
 @Stateless
 public class EmployeeDAO extends AbstractDAO<Employee> {
@@ -42,7 +41,6 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @PostConstruct
     private void init() {
         super.init(Employee.class, getNameReturner().getPersistenceUnitName());
-        System.out.println("******************** EmployeeDAO ********************");                                
     }
 
     /**
@@ -55,8 +53,8 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @Override
     public Long create(Employee employee) throws IOException {
         try {
-            System.out.println("e creation");            
             getEt().begin();
+            employee.setDepartment(getEm().find(Department.class, employee.getDepartment().getId()));
             getEm().persist(employee);
             getEt().commit();
         } catch (Exception e) {
@@ -98,7 +96,6 @@ public class EmployeeDAO extends AbstractDAO<Employee> {
     @Override
     protected void clean() {
         super.clean();
-        System.out.println("******************** EmployeeDAO clean ********************");                                        
     }
 
 }

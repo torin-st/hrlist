@@ -4,13 +4,13 @@ import javax.enterprise.inject.Alternative;
 
 /**
  *
- * @author A.G. Slyadz
  */
 @PersistenceUnitName @Alternative
 public class HrlistIT implements NameReturner {
     
     @Override
     public String getPersistenceUnitName() {
+        System.out.println("************HELLO***************************");
         return "hrlistIT";
     }
         

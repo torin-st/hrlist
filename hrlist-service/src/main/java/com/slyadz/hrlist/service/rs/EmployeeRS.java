@@ -2,6 +2,7 @@ package com.slyadz.hrlist.service.rs;
 
 import com.slyadz.hrlist.entity.Employee;
 import com.slyadz.hrlist.service.persistence.EmployeeDAO;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.text.ParseException;
@@ -9,10 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,23 +29,12 @@ import javax.ws.rs.core.Response;
  *
  * @author A.G. Slyadz
  */
-//@Stateless
 @Path("employees")
 public class EmployeeRS implements Serializable {
     
     @EJB
     public EmployeeDAO edao;
     
-    @PostConstruct
-    private void init() {
-        System.out.println("******************** EmployeeRS ********************");                                
-    }    
-
-    @PreDestroy
-    private void clear() {
-        System.out.println("******************** EmployeeRS clear ********************");                                
-    }        
-
     public EmployeeDAO getEdao() {
         return edao;
     }
@@ -97,7 +84,7 @@ public class EmployeeRS implements Serializable {
             if (result == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
         
@@ -135,7 +122,7 @@ public class EmployeeRS implements Serializable {
             if (result == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }        
         
@@ -160,8 +147,8 @@ public class EmployeeRS implements Serializable {
             if (result == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            
         }
         
         return result;        
@@ -186,8 +173,7 @@ public class EmployeeRS implements Serializable {
         
         try {
             getEdao().update(employee);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());            
+        } catch (IOException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
         
@@ -210,8 +196,7 @@ public class EmployeeRS implements Serializable {
         
         try {
             getEdao().delete(findById(employeeId));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
     }

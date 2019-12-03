@@ -9,8 +9,6 @@ import javax.inject.Inject;
 
 /**
  * DAO class for Department entity
- *
- * @author A.G. Slyadz
  */
 @Stateless
 public class DepartmentDAO extends AbstractDAO<Department> {
@@ -36,7 +34,6 @@ public class DepartmentDAO extends AbstractDAO<Department> {
     @PostConstruct
     private void init() {
         super.init(Department.class, getNameReturner().getPersistenceUnitName());
-        System.out.println("******************** DepartmentDAO ********************");                        
     }
 
     /**
@@ -49,7 +46,6 @@ public class DepartmentDAO extends AbstractDAO<Department> {
     @Override
     public Long create(Department department) throws IOException {
         try {
-            System.out.println("d creation");
             getEt().begin();
             getEm().persist(department);
             getEt().commit();
@@ -61,13 +57,12 @@ public class DepartmentDAO extends AbstractDAO<Department> {
     }
 
     /**
-     * Closes EntityManager and EntityMangerFactory if they are not null.
+     * Closes EntityManager and EntityMangerFactory if they are not null
      */
     @PreDestroy
     @Override
     protected void clean() {
         super.clean();
-        System.out.println("******************** DepartmentDAO clean ********************");                                
     }
 
 }

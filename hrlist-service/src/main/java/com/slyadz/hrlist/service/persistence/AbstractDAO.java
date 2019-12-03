@@ -11,8 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 /**
  * Parent class for all DAO-classes
  *
- * @author A.G. Slyadz
- * @param <T> entity type
+  * @param <T> entity type
  */
 public abstract class AbstractDAO<T> {
 
@@ -161,7 +160,7 @@ public abstract class AbstractDAO<T> {
     }
 
     /**
-     * Closes EntityManager and EntityMangerFactory if they are not null.
+     * Closes EntityManager and EntityMangerFactory if they are not null
      */
     protected void clean() {
         if (getEm() != null) {

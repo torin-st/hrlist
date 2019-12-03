@@ -6,11 +6,10 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 /**
- *
- * @author A.G. Slyadz
+ * ServiceApplication class
  */
 @ApplicationPath("api")
-public class DepartmentApplication extends Application {
+public class ServiceApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {

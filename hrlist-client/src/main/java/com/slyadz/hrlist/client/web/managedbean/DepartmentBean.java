@@ -139,8 +139,7 @@ public class DepartmentBean extends AbstractEntityBean<Department> implements Se
             result = getClient().target(getServiceURL())
                     .path("/")
                     .request(MediaType.APPLICATION_XML)
-                    .get(new GenericType<List<Department>>() {
-                    }); //Doesn't work in AbstractEntityBean - find out why
+                    .get( new GenericType< List<Department> >(){} ); //Doesn't work in AbstractEntityBean - find out why
         } catch (Exception e) {
             parentMessageWrapper("CouldNotFindAll" + getOutcomePrefix(), new Object[]{e.getMessage()});
             return null;
