@@ -20,6 +20,7 @@ import org.glassfish.embeddable.GlassFish;
 import org.glassfish.embeddable.GlassFishException;
 import org.glassfish.embeddable.GlassFishProperties;
 import org.glassfish.embeddable.GlassFishRuntime;
+import org.glassfish.embeddable.archive.ScatteredArchive;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -84,15 +85,21 @@ public class DepartmentRSTestIT {
 
     @BeforeClass
     public static void setUpClass() throws NamingException, Exception {
-        //preconfigured glassfish config
         GlassFishProperties glassfishProperties = new GlassFishProperties();
+        //preconfigured glassfish-server config (port 8080, user: test with pass: 123 with group: TutorialUser)
         File instanceRoot = new File("target/test-classes/glassfish4/glassfish/domains/domain1");        
         glassfishProperties.setInstanceRoot(instanceRoot.getPath());
         //starting and deploying glassfish
         setGlassFish(GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties));
         getGlassFish().start();
         setDeployer(getGlassFish().getDeployer());
-        setAppName(getDeployer().deploy(new File("target/hrlist-service-1.0.war"), "--name=hrlist-service", "--contextroot=hrlist-service", "--force=true"));
+        ScatteredArchive archive = new ScatteredArchive("hrlist-service", ScatteredArchive.Type.WAR);
+        //target/classes directory contains complied class-files
+        archive.addClassPath(new File("target", "classes"));
+        //custom beans.xml to use different persistent unit during integration test
+        archive.addMetadata(new File("target/test-classes/META-INF", "beans.xml"));
+        //deploy the scattered web archive.
+        setAppName(deployer.deploy(archive.toURI(), "--name=hrlist-service", "--contextroot=hrlist-service", "--force=true"));
         //http client
         HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("test", "123");
         Client client = ClientBuilder.newClient();
