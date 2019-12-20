@@ -5,9 +5,7 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.util.logging.Logger;
 /**
- * Produce logger for class
- * 
- * @author A.G. Slyadz
+ * Produce logger for class 
  */
 public class LoggingProducer {
     @Produces

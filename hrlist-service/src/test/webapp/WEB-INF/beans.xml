@@ -5,6 +5,6 @@
       http://java.sun.com/xml/ns/javaee 
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
     <alternatives>
-        <class>com.slyadz.hrlist.service.persistence.HrlistIT</class>
+        <class>com.slyadz.hrlist.service.persistence.HrlistITTestFor</class>
     </alternatives>    
 </beans>

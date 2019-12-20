@@ -10,8 +10,7 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
- *
- * @author A.G. Slyadz
+ * An annotation for persistence unit name returners
  */
 @Qualifier
 @Retention(RUNTIME)

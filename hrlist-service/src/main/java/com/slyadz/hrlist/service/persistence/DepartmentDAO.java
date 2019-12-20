@@ -2,6 +2,7 @@ package com.slyadz.hrlist.service.persistence;
 
 import com.slyadz.hrlist.entity.Department;
 import java.io.IOException;
+import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
@@ -11,7 +12,7 @@ import javax.inject.Inject;
  * DAO class for Department entity
  */
 @Stateless
-public class DepartmentDAO extends AbstractDAO<Department> {
+public class DepartmentDAO extends AbstractDAO<Department> implements Serializable {
 
     @Inject
     @PersistenceUnitName

@@ -26,8 +26,6 @@ import javax.ws.rs.core.Response;
 
 /**
  * Performs CRUD-operations with Employee entities.
- *
- * @author A.G. Slyadz
  */
 @Path("employees")
 public class EmployeeRS implements Serializable {

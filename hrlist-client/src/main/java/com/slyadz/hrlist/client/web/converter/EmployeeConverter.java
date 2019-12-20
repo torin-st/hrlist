@@ -10,9 +10,7 @@ import javax.faces.convert.FacesConverter;
 
 /**
  * Converter class for a Employee type.
- *
- * @author A.G. Slyadz
- */
+  */
 @FacesConverter(forClass = Employee.class)
 public class EmployeeConverter implements Converter {
 

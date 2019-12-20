@@ -8,8 +8,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 /**
- *
- * @author A.G. Slyadz
+ * Backing bean for new Employee creation
  */
 @Named
 @ViewScoped

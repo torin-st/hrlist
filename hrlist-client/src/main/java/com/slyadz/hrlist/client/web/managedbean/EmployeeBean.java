@@ -20,8 +20,7 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 /**
- *
- * @author A.G. Slyadz
+ * Backing bean for Employee
  */
 @Named
 @SessionScoped

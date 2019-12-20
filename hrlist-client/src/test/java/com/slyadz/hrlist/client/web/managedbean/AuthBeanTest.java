@@ -9,8 +9,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- *
- * @author A.G. Slyadz
+ * Perform module tests for the AuthBean class
  */
 public class AuthBeanTest {
     

@@ -12,8 +12,6 @@ import javax.interceptor.InvocationContext;
 
 /**
  * Interceptor-class for logging business methods
- * 
- * @author A.G. Slyadz
  */
 @Interceptor
 @Loggable

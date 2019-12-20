@@ -6,7 +6,7 @@ import javax.enterprise.inject.Alternative;
  * Return alternative persistent unit name for integration test
  */
 @PersistenceUnitName @Alternative
-public class HrlistIT implements NameReturner {
+public class HrlistITTestFor implements NameReturner {
     
     @Override
     public String getPersistenceUnitName() {

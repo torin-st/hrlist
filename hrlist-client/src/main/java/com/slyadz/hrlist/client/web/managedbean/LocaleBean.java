@@ -17,10 +17,9 @@ import javax.inject.Named;
  */
 @Named
 @SessionScoped
-//@Loggable
+@Loggable
 public class LocaleBean extends AbstractBean implements Serializable {
 
-    private static final long serialVersionUID = -2181710426297811604L;
     private Locale locale;
     private String localeCode;
     private Map<String, Locale> countries;

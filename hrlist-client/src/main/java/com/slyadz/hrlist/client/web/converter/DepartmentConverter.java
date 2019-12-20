@@ -10,8 +10,6 @@ import javax.faces.convert.FacesConverter;
 
 /**
  * Converter class for a Department type.
- *
- * @author A.G. Slyadz
  */
 @FacesConverter(forClass = Department.class)
 public class DepartmentConverter implements Converter {

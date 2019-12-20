@@ -17,8 +17,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Perform module tests for the DepartmentConverter class
- *
- * @author A.G. Slyadz
  */
 public class DepartmentConverterTest {
 

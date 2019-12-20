@@ -10,12 +10,11 @@ import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 /**
- *
- * @author A.G. Slyadz
+ * Authentication information for pages
  */
 @Named
 @SessionScoped
-//@Loggable
+@Loggable
 public class AuthBean extends AbstractBean implements Serializable {
     public AuthBean() {
     }

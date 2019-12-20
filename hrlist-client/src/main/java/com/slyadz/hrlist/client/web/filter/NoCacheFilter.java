@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Don't use cache for secured pages
- * 
- * @author A.G. Slyadz
+ * Filter for servlets: don't use cache for secured pages 
  */
 @WebFilter(//servletNames = {"Faces Servlet"},
         filterName = "NoCacheFilter",

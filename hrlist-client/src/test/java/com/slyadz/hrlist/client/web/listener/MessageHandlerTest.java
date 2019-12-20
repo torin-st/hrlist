@@ -16,8 +16,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Perform module tests for the MessageHandler class
- *
- * @author user
  */
 public class MessageHandlerTest {
 

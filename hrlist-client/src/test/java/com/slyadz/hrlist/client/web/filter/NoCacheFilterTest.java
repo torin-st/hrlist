@@ -8,8 +8,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Perform module tests for the NoCacheFilter class
- * 
- * @author A.G. Slyadz
  */
 public class NoCacheFilterTest {
     

@@ -4,6 +4,7 @@ import com.slyadz.hrlist.entity.Department;
 import com.slyadz.hrlist.service.persistence.DepartmentDAO;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.naming.Context;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Perform integration test for DepartmentRS class
  */
-public class DepartmentRSTestIT {
+public class DepartmentRSTestIT implements Serializable {
 
     private final static Logger logger = Logger.getLogger(DepartmentRSTestIT.class.getCanonicalName());
     private final static String SERVICE_URL = "http://localhost:8080/hrlist-service/api/departments";
@@ -102,9 +103,7 @@ public class DepartmentRSTestIT {
         setAppName(deployer.deploy(archive.toURI(), "--name=hrlist-service", "--contextroot=hrlist-service", "--force=true"));
         //http client
         HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("test", "123");
-        Client client = ClientBuilder.newClient();
-        client.register(feature);        
-        setClient(client);
+        setClient(ClientBuilder.newClient().register(feature));
         //EJB fetching
         Context ctx = new InitialContext();
         setDepartmentDAO((DepartmentDAO) ctx.lookup("java:global/hrlist-service/DepartmentDAO"));
