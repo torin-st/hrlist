@@ -1,4 +1,6 @@
 # Example project for demonstrating a Java EE 7 web application
+## Prerequisites
+Java 1.8
 ## Content and technologies
 ### hrlist-common
 
